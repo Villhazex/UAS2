@@ -52,6 +52,22 @@ class TugasModel extends Tugas {
 
         return $this->conn->query($query);
     }
+
+    // hapus semua tugas
+    public function hapusSemua() {
+
+        $query = "DELETE FROM tugas";
+
+        return $this->conn->query($query);
+    }
+
+    // hapus semua tugas selesai
+    public function hapusSelesai() {
+
+        $query = "DELETE FROM tugas WHERE status_tugas = 'Selesai'";
+
+        return $this->conn->query($query);
+    }
 }
 
 ?>

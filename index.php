@@ -68,14 +68,12 @@ body {
     overflow-x: hidden;
     padding: 36px 28px 32px;
     border-right: 3px solid var(--ink);
-    /* custom scrollbar */
     scrollbar-width: thin;
     scrollbar-color: rgba(255,255,255,0.12) transparent;
 }
 .sidebar::-webkit-scrollbar { width: 4px; }
 .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
 
-/* issue tag */
 .issue-tag {
     display: inline-block;
     border: 1.5px solid rgba(255,255,255,0.18);
@@ -88,7 +86,6 @@ body {
     margin-bottom: 20px;
 }
 
-/* main title */
 .main-title {
     font-family: 'DM Serif Display', serif;
     font-size: 56px;
@@ -117,7 +114,6 @@ body {
     margin-bottom: 32px;
 }
 
-/* big progress circle */
 .prog-wrap {
     display: flex;
     align-items: center;
@@ -155,7 +151,6 @@ body {
     color: rgba(250,246,238,0.35);
 }
 
-/* stat row */
 .stat-row {
     display: flex;
     gap: 0;
@@ -186,14 +181,12 @@ body {
 .stat-cell-val.blue  { color: #6699ff; }
 .stat-cell-val.green { color: var(--deco3); }
 
-/* divider */
 .s-divider {
     height: 1px;
     background: rgba(255,255,255,0.08);
     margin-bottom: 24px;
 }
 
-/* input section */
 .input-label {
     font-size: 9px;
     font-weight: 700;
@@ -235,10 +228,63 @@ body {
     padding: 13px 20px;
     cursor: pointer;
     transition: background 0.15s, color 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border-radius: 4px;
 }
 .input-submit:hover { background: var(--deco1); color: #fff; }
 
-/* spacer pushes footer to bottom */
+/* ── TOMBOL AKSI MASSAL ───────────────────── */
+.aksi-tugas {
+    display: flex;
+    gap: 10px;
+    margin-top: 18px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+}
+
+.btn-hapus-semua,
+.btn-hapus-selesai {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    font-family: 'Anybody', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 9px 16px;
+    border-radius: 6px;
+    border: 1.5px solid;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.btn-hapus-semua {
+    background: rgba(193,0,0,0.1);
+    border-color: rgba(193,0,0,0.4);
+    color: #ff6b6b;
+}
+.btn-hapus-semua:hover {
+    background: #c10000;
+    border-color: #c10000;
+    color: #fff;
+}
+
+.btn-hapus-selesai {
+    background: rgba(0,204,119,0.1);
+    border-color: rgba(0,204,119,0.4);
+    color: var(--deco3);
+}
+.btn-hapus-selesai:hover {
+    background: #00b26b;
+    border-color: #00b26b;
+    color: #fff;
+}
+
 .sidebar-spacer { flex: 1; }
 
 .sidebar-footer {
@@ -270,7 +316,6 @@ body {
     padding: 36px 36px 60px;
 }
 
-/* section head */
 .section-head {
     display: flex;
     align-items: center;
@@ -377,26 +422,44 @@ body {
     color: var(--card-bg, #fff);
 }
 
-.card-actions { display: flex; gap: 7px; margin-top: 14px; }
+/* ── TOMBOL KARTU ─────────────────────────── */
+.card-actions { display: flex; gap: 8px; margin-top: 14px; }
 
 .card-btn {
     text-decoration: none;
     font-family: 'Anybody', sans-serif;
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: 0.08em;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
-    padding: 6px 12px;
-    border: 2px solid;
+    padding: 7px 14px;
+    border: 1.5px solid;
     cursor: pointer;
     background: transparent;
     transition: all 0.15s;
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border-radius: 4px;
 }
-.card-btn.ok { border-color: var(--card-ink,#000); color: var(--card-ink,#000); }
-.card-btn.ok:hover { background: var(--card-ink,#000); color: var(--card-bg,#fff); }
-.card-btn.rm { border-color: rgba(26,18,8,0.22); color: rgba(26,18,8,0.38); }
-.card-btn.rm:hover { border-color: #c10000; color: #c10000; }
+.card-btn.ok {
+    border-color: var(--card-ink);
+    color: var(--card-ink);
+    background: rgba(0,0,0,0.04);
+}
+.card-btn.ok:hover {
+    background: var(--card-ink);
+    color: var(--card-bg);
+}
+.card-btn.rm {
+    border-color: rgba(193,0,0,0.25);
+    color: rgba(193,0,0,0.45);
+}
+.card-btn.rm:hover {
+    border-color: #c10000;
+    color: #c10000;
+    background: rgba(193,0,0,0.06);
+}
 
 /* ── EMPTY ────────────────────────────────── */
 .empty {
@@ -436,12 +499,13 @@ body {
 <!-- ═══ SIDEBAR ═══ -->
 <aside class="sidebar">
 
-    <div class="issue-tag">✦ Edisi Kuliah &nbsp;·&nbsp; Vol. <?= date('Y') ?></div>
+    <div class="issue-tag">✦ Luminous &nbsp;·&nbsp; Vol. <?= date('Y') ?></div>
 
     <div class="main-title">
-        <div class="shadow-text" aria-hidden="true">Tugas<br><em>Kuliah</em></div>
-        <div class="main-text">Tugas<br><span class="accent-word">Kuliah</span></div>
+        <div class="shadow-text" aria-hidden="true">To do list<br><em>Organisasi</em></div>
+        <div class="main-text">To do list<br><span class="accent-word">Organisasi</span></div>
     </div>
+    <br>
     <div class="subtitle"><?= date('d M Y') ?></div>
 
     <!-- progress circle -->
@@ -492,6 +556,19 @@ body {
         >
         <button class="input-submit" type="submit">+ Tambah</button>
     </form>
+
+    <div class="aksi-tugas">
+        <a href="hapus_semua.php"
+           onclick="return confirm('Hapus semua tugas?')"
+           class="btn-hapus-semua">
+           ✕ Hapus Semua
+        </a>
+        <a href="hapus_selesai.php"
+           onclick="return confirm('Hapus semua tugas selesai?')"
+           class="btn-hapus-selesai">
+           ✓ Hapus yang Selesai
+        </a>
+    </div>
 
     <div class="sidebar-spacer"></div>
 
@@ -547,7 +624,7 @@ body {
                             <a href="selesai.php?id=<?= $row['id'] ?>" class="card-btn ok">✓ Done</a>
                             <?php endif; ?>
                             <a href="hapus.php?id=<?= $row['id'] ?>" class="card-btn rm"
-                               onclick="return confirm('Hapus tugas ini?')">✕ Hapus</a>
+                               onclick="return">✕ Hapus</a>
                         </div>
                     </div>
                 </div>
