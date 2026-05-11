@@ -239,50 +239,47 @@ body {
 /* ── TOMBOL AKSI MASSAL ───────────────────── */
 .aksi-tugas {
     display: flex;
-    gap: 10px;
+    flex-direction: column;
+    gap: 8px;
     margin-top: 18px;
     margin-bottom: 18px;
-    flex-wrap: wrap;
 }
 
 .btn-hapus-semua,
 .btn-hapus-selesai {
-    display: inline-flex;
+    display: flex;
     align-items: center;
+    justify-content: center;
     gap: 6px;
     text-decoration: none;
     font-family: 'Anybody', sans-serif;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
-    padding: 9px 16px;
-    border-radius: 6px;
-    border: 1.5px solid;
+    padding: 13px 20px;
     cursor: pointer;
-    transition: all 0.15s;
+    transition: background 0.15s, color 0.15s;
+    border-radius: 4px;
+    border: none;
 }
 
 .btn-hapus-semua {
-    background: rgba(193,0,0,0.1);
-    border-color: rgba(193,0,0,0.4);
-    color: #ff6b6b;
+    background: rgba(255,255,255,0.12);
+    color: var(--cream);
 }
 .btn-hapus-semua:hover {
-    background: #c10000;
-    border-color: #c10000;
+    background: var(--deco1);
     color: #fff;
 }
 
 .btn-hapus-selesai {
-    background: rgba(0,204,119,0.1);
-    border-color: rgba(0,204,119,0.4);
-    color: var(--deco3);
+    background: rgba(255,255,255,0.12);
+    color: var(--cream);
 }
 .btn-hapus-selesai:hover {
-    background: #00b26b;
-    border-color: #00b26b;
-    color: #fff;
+    background: var(--deco3);
+    color: var(--ink);
 }
 
 .sidebar-spacer { flex: 1; }
