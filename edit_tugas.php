@@ -3,12 +3,6 @@
 require_once 'koneksi.php';
 require_once 'Tugas.php';
 
-?>
-
-<link rel="stylesheet" href="style.css">
-
-<?php
-
 $db = new Database();
 $conn = $db->conn;
 
@@ -30,12 +24,31 @@ if(isset($_POST['update'])){
     $deskripsi = $_POST['deskripsi'];
     $due_date = $_POST['due_date'];
 
-    $tugas->editTugas(
-        $id,
-        $judul,
-        $mata_kuliah,
-        $deskripsi,
-        $due_date
+    $namaFile = $row['file_tugas'];
+
+    if($_FILES['file']['name'] != ""){
+
+        unlink("uploads/tugas/".$row['file_tugas']);
+
+        $namaFile = $_FILES['file']['name'];
+        $tmp = $_FILES['file']['tmp_name'];
+
+        move_uploaded_file(
+            $tmp,
+            'uploads/tugas/'.$namaFile
+        );
+
+    }
+
+    mysqli_query(
+        $conn,
+        "UPDATE tugas
+         SET judul='$judul',
+             mata_kuliah='$mata_kuliah',
+             deskripsi='$deskripsi',
+             due_date='$due_date',
+             file_tugas='$namaFile'
+         WHERE id='$id'"
     );
 
     header('location:dosen.php');
@@ -44,9 +57,11 @@ if(isset($_POST['update'])){
 
 ?>
 
+<link rel="stylesheet" href="style.css">
+
 <h2>Edit Tugas</h2>
 
-<form method="POST">
+<form method="POST" enctype="multipart/form-data">
 
 <input
 type="text"
@@ -73,6 +88,15 @@ type="date"
 name="due_date"
 value="<?= $row['due_date']; ?>"
 >
+
+<br><br>
+
+File Lama:
+<?= $row['file_tugas']; ?>
+
+<br><br>
+
+<input type="file" name="file">
 
 <br><br>
 
