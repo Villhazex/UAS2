@@ -1,6 +1,11 @@
 <?php
 
 session_start();
+?>
+
+<link rel="stylesheet" href="style.css">
+
+<?php
 
 require_once 'koneksi.php';
 

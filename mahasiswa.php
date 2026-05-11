@@ -2,6 +2,12 @@
 
 session_start();
 
+?>
+
+<link rel="stylesheet" href="style.css">
+
+<?php
+
 require_once 'koneksi.php';
 require_once 'Tugas.php';
 
@@ -28,7 +34,10 @@ $data = $tugas->tampilTugas();
 
 <th>No</th>
 <th>Judul</th>
+<th>Mata Kuliah</th>
 <th>Dosen</th>
+<th>Due Date</th>
+<th>Status</th>
 <th>File</th>
 <th>Aksi</th>
 
@@ -40,6 +49,17 @@ $no = 1;
 
 while($row=mysqli_fetch_assoc($data)) {
 
+$id_tugas = $row['id'];
+
+$cek = mysqli_query(
+    $conn,
+    "SELECT * FROM jawaban
+     WHERE tugas_id='$id_tugas'
+     AND mahasiswa_id='".$_SESSION['id']."'"
+);
+
+$sudah = mysqli_num_rows($cek);
+
 ?>
 
 <tr>
@@ -48,7 +68,49 @@ while($row=mysqli_fetch_assoc($data)) {
 
 <td><?= $row['judul']; ?></td>
 
+<td><?= $row['mata_kuliah']; ?></td>
+
 <td><?= $row['nama']; ?></td>
+
+<td>
+
+<?php
+
+if(strtotime($row['due_date']) < strtotime(date('Y-m-d'))) {
+
+    echo "<span class='red'>";
+    echo $row['due_date'];
+    echo "</span>";
+
+} else {
+
+    echo "<span class='green'>";
+    echo $row['due_date'];
+    echo "</span>";
+
+}
+
+?>
+
+</td>
+
+<td>
+
+<?php
+
+if($sudah > 0){
+
+    echo "Sudah Mengumpulkan";
+
+} else {
+
+    echo "Belum Mengumpulkan";
+
+}
+
+?>
+
+</td>
 
 <td>
 

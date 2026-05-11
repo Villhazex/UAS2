@@ -10,17 +10,28 @@ class Tugas {
 
     }
 
-    public function tambahTugas($judul,$deskripsi,$file,$dosen_id){
+    public function tambahTugas(
+        $judul,
+        $mata_kuliah,
+        $deskripsi,
+        $due_date,
+        $file,
+        $dosen_id
+    ){
 
         $query = "INSERT INTO tugas(
                     judul,
+                    mata_kuliah,
                     deskripsi,
+                    due_date,
                     file_tugas,
                     dosen_id
                   )
                   VALUES(
                     '$judul',
+                    '$mata_kuliah',
                     '$deskripsi',
+                    '$due_date',
                     '$file',
                     '$dosen_id'
                   )";
@@ -32,19 +43,28 @@ class Tugas {
     public function tampilTugas(){
 
         $query = "SELECT tugas.*, users.nama
-                  FROM tugas
-                  JOIN users
-                  ON tugas.dosen_id = users.id";
+                FROM tugas
+                JOIN users
+                ON tugas.dosen_id = users.id
+                ORDER BY tugas.id DESC";
 
         return mysqli_query($this->conn,$query);
 
     }
 
-    public function editTugas($id,$judul,$deskripsi){
+    public function editTugas(
+        $id,
+        $judul,
+        $mata_kuliah,
+        $deskripsi,
+        $due_date
+    ){
 
         $query = "UPDATE tugas
                   SET judul='$judul',
-                      deskripsi='$deskripsi'
+                      mata_kuliah='$mata_kuliah',
+                      deskripsi='$deskripsi',
+                      due_date='$due_date'
                   WHERE id='$id'";
 
         return mysqli_query($this->conn,$query);

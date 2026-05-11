@@ -2,6 +2,12 @@
 
 session_start();
 
+?>
+
+<link rel="stylesheet" href="style.css">
+
+<?php
+
 require_once 'koneksi.php';
 require_once 'Tugas.php';
 
@@ -32,7 +38,9 @@ $data = $tugas->tampilTugas();
 
 <th>No</th>
 <th>Judul</th>
+<th>Mata Kuliah</th>
 <th>Dosen</th>
+<th>Due Date</th>
 <th>File</th>
 <th>Aksi</th>
 
@@ -52,7 +60,11 @@ while($row=mysqli_fetch_assoc($data)) {
 
 <td><?= $row['judul']; ?></td>
 
+<td><?= $row['mata_kuliah']; ?></td>
+
 <td><?= $row['nama']; ?></td>
+
+<td><?= $row['due_date']; ?></td>
 
 <td>
 
