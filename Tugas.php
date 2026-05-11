@@ -17,13 +17,13 @@ class Tugas {
                     deskripsi,
                     file_tugas,
                     dosen_id
-                )
-                VALUES(
+                  )
+                  VALUES(
                     '$judul',
                     '$deskripsi',
                     '$file',
                     '$dosen_id'
-                )";
+                  )";
 
         return mysqli_query($this->conn,$query);
 
@@ -31,7 +31,10 @@ class Tugas {
 
     public function tampilTugas(){
 
-        $query = "SELECT * FROM tugas";
+        $query = "SELECT tugas.*, users.nama
+                  FROM tugas
+                  JOIN users
+                  ON tugas.dosen_id = users.id";
 
         return mysqli_query($this->conn,$query);
 
@@ -39,19 +42,19 @@ class Tugas {
 
     public function editTugas($id,$judul,$deskripsi){
 
-    $query = "UPDATE tugas
-              SET judul='$judul',
-                  deskripsi='$deskripsi'
-              WHERE id='$id'";
+        $query = "UPDATE tugas
+                  SET judul='$judul',
+                      deskripsi='$deskripsi'
+                  WHERE id='$id'";
 
-    return mysqli_query($this->conn,$query);
+        return mysqli_query($this->conn,$query);
 
     }
 
     public function hapusTugas($id){
 
         $query = "DELETE FROM tugas
-                WHERE id='$id'";
+                  WHERE id='$id'";
 
         return mysqli_query($this->conn,$query);
 

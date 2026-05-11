@@ -8,22 +8,15 @@ require_once 'Tugas.php';
 $db = new Database();
 $conn = $db->conn;
 
-/*
-|--------------------------------------------------------------------------
-| Ambil semua tugas + nama dosen
-|--------------------------------------------------------------------------
-*/
+$tugas = new Tugas($conn);
 
-$query = "SELECT tugas.*, users.nama
-          FROM tugas
-          JOIN users
-          ON tugas.dosen_id = users.id";
-
-$data = mysqli_query($conn, $query);
+$data = $tugas->tampilTugas();
 
 ?>
 
 <h2>Dashboard Mahasiswa</h2>
+
+<h3>Halo, <?= $_SESSION['nama']; ?></h3>
 
 <a href="logout.php">Logout</a>
 
@@ -33,11 +26,11 @@ $data = mysqli_query($conn, $query);
 
 <tr>
 
-    <th>No</th>
-    <th>Judul</th>
-    <th>Dosen</th>
-    <th>File</th>
-    <th>Aksi</th>
+<th>No</th>
+<th>Judul</th>
+<th>Dosen</th>
+<th>File</th>
+<th>Aksi</th>
 
 </tr>
 
@@ -45,29 +38,33 @@ $data = mysqli_query($conn, $query);
 
 $no = 1;
 
-while($row = mysqli_fetch_assoc($data)) {
+while($row=mysqli_fetch_assoc($data)) {
 
 ?>
 
 <tr>
 
-    <td><?= $no++; ?></td>
+<td><?= $no++; ?></td>
 
-    <td><?= $row['judul']; ?></td>
+<td><?= $row['judul']; ?></td>
 
-    <td><?= $row['nama']; ?></td>
+<td><?= $row['nama']; ?></td>
 
-    <td>
-        <a href="uploads/tugas/<?= $row['file_tugas']; ?>">
-            Download
-        </a>
-    </td>
+<td>
 
-    <td>
-        <a href="upload_jawaban.php?id=<?= $row['id']; ?>">
-            Upload Jawaban
-        </a>
-    </td>
+<a href="uploads/tugas/<?= $row['file_tugas']; ?>">
+Download
+</a>
+
+</td>
+
+<td>
+
+<a href="upload_jawaban.php?id=<?= $row['id']; ?>">
+Upload Jawaban
+</a>
+
+</td>
 
 </tr>
 

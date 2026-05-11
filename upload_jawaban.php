@@ -43,6 +43,8 @@ if(isset($_POST['upload'])){
 <input type="file" name="file">
 <br><br>
 
-<button name="upload">Upload</button>
+<button name="upload">
+Upload
+</button>
 
 </form>

@@ -1,4 +1,5 @@
 <?php
+
 session_start();
 
 require_once 'koneksi.php';
@@ -22,6 +23,7 @@ if(isset($_POST['login'])){
         $data = mysqli_fetch_assoc($result);
 
         $_SESSION['id'] = $data['id'];
+        $_SESSION['nama'] = $data['nama'];
         $_SESSION['role'] = $data['role'];
 
         if($data['role'] == 'dosen'){
@@ -37,18 +39,21 @@ if(isset($_POST['login'])){
     }
 
 }
+
 ?>
 
 <form method="POST">
 
-    <h2>Login</h2>
+<h2>Login</h2>
 
-    <input type="text" name="username" placeholder="Username">
-    <br><br>
+<input type="text" name="username" placeholder="Username">
+<br><br>
 
-    <input type="password" name="password" placeholder="Password">
-    <br><br>
+<input type="password" name="password" placeholder="Password">
+<br><br>
 
-    <button name="login">Login</button>
+<button name="login">
+Login
+</button>
 
 </form>

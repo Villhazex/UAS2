@@ -5,7 +5,7 @@ class Database {
     private $host = "localhost";
     private $user = "root";
     private $pass = "";
-    private $db = "tugas_oop";
+    private $db = "uas_oop";
 
     public $conn;
 
@@ -19,6 +19,7 @@ class Database {
         );
 
     }
+
 }
 
 ?>
