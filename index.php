@@ -236,7 +236,6 @@ body {
 }
 .input-submit:hover { background: var(--deco1); color: #fff; }
 
-/* ── TOMBOL AKSI MASSAL ───────────────────── */
 .aksi-tugas {
     display: flex;
     flex-direction: column;
@@ -353,7 +352,32 @@ body {
     transform: translate(-3px,-3px);
     box-shadow: 8px 8px 0 var(--card-ink, #000);
 }
-.task-card.done { opacity: 0.52; }
+.task-card.done {
+    background: #dedad4 !important;
+    border-color: #9a9590;
+    box-shadow: 3px 3px 0 #9a9590 !important;
+    filter: saturate(0.1);
+    opacity: 0.75;
+}
+.task-card.done:hover {
+    transform: translate(-2px,-2px);
+    box-shadow: 5px 5px 0 #9a9590 !important;
+}
+.done-stamp {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%) rotate(-20deg);
+    font-family: 'DM Serif Display', serif;
+    font-style: italic;
+    font-size: 42px;
+    font-weight: 400;
+    color: rgba(0,0,0,0.065);
+    white-space: nowrap;
+    pointer-events: none;
+    letter-spacing: .04em;
+    z-index: 0;
+    user-select: none;
+}
 
 .task-card::before {
     content: '';
@@ -398,7 +422,11 @@ body {
     min-height: 46px;
     word-break: break-word;
 }
-.task-card.done .card-title { text-decoration: line-through; opacity: 0.45; }
+.task-card.done .card-title {
+    text-decoration: line-through;
+    text-decoration-thickness: 2px;
+    color: #777;
+}
 
 .card-divider { height: 1.5px; background: var(--card-ink, #000); opacity: 0.1; margin: 12px 0; }
 
@@ -419,8 +447,19 @@ body {
     color: var(--card-bg, #fff);
 }
 
-/* ── TOMBOL KARTU ─────────────────────────── */
-.card-actions { display: flex; gap: 8px; margin-top: 14px; }
+/* ── CARD ACTIONS — hover reveal ─────────── */
+.card-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 0.18s ease, transform 0.18s ease;
+}
+.task-card:hover .card-actions {
+    opacity: 1;
+    transform: translateY(0);
+}
 
 .card-btn {
     text-decoration: none;
@@ -487,6 +526,8 @@ body {
     .main { height: auto; overflow: visible; }
     .main-inner { padding: 24px 20px 48px; }
     .cards { grid-template-columns: repeat(auto-fill, minmax(160px,1fr)); gap: 14px; }
+    /* always show on mobile (no hover) */
+    .card-actions { opacity: 1; transform: none; }
 }
 
 </style>
@@ -505,7 +546,6 @@ body {
     <br>
     <div class="subtitle"><?= date('d M Y') ?></div>
 
-    <!-- progress circle -->
     <div class="prog-wrap">
         <svg class="prog-svg" width="72" height="72" viewBox="0 0 72 72">
             <circle class="prog-track" cx="36" cy="36" r="30"/>
@@ -522,7 +562,6 @@ body {
         </div>
     </div>
 
-    <!-- stat cells -->
     <div class="stat-row">
         <div class="stat-cell">
             <div class="stat-cell-label">Total</div>
@@ -540,7 +579,6 @@ body {
 
     <div class="s-divider"></div>
 
-    <!-- input -->
     <div class="input-label">✦ Tambah tugas baru</div>
     <form class="input-form" action="tambah.php" method="POST">
         <input
@@ -608,6 +646,7 @@ body {
                     "
                 >
                     <div class="card-band"></div>
+                    <?php if($done): ?><div class="done-stamp">Selesai</div><?php endif; ?>
                     <div class="card-inner">
                         <div class="card-shape"><?= $shape ?></div>
                         <div class="card-index">№ <?= str_pad($i+1, 2, '0', STR_PAD_LEFT) ?></div>
@@ -621,7 +660,7 @@ body {
                             <a href="selesai.php?id=<?= $row['id'] ?>" class="card-btn ok">✓ Done</a>
                             <?php endif; ?>
                             <a href="hapus.php?id=<?= $row['id'] ?>" class="card-btn rm"
-                               onclick="return">✕ Hapus</a>
+                               onclick="return confirm('Hapus tugas ini?')">✕ Hapus</a>
                         </div>
                     </div>
                 </div>
