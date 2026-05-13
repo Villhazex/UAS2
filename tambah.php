@@ -2,6 +2,8 @@
 
 session_start();
 
+$user_id = $_SESSION['user_id'];
+
 require_once "class/TugasModel.php";
 
 if(isset($_POST['nama_tugas'])) {
