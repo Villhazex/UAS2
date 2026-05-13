@@ -5,13 +5,24 @@ class Tugas {
     // encapsulation
     protected $namaTugas;
     protected $statusTugas;
+    protected $dueDate;
+    protected $prioritas;
+    protected $kategori;
 
     // constructor
-    public function __construct($namaTugas, $statusTugas = "Belum Selesai") {
-
-        $this->namaTugas = $namaTugas;
-        $this->statusTugas = $statusTugas;
-    }
+    public function __construct(
+    $namaTugas = "",
+    $statusTugas = "Belum Selesai",
+    $dueDate = null,
+    $prioritas = "",
+    $kategori = ""
+) {
+    $this->namaTugas   = $namaTugas;
+    $this->statusTugas = $statusTugas;
+    $this->dueDate     = $dueDate;
+    $this->prioritas   = $prioritas;
+    $this->kategori    = $kategori;
+}
 
     // setter
     public function setNamaTugas($namaTugas) {

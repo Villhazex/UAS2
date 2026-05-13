@@ -1,9 +1,20 @@
 <?php
-
 require_once "class/TugasModel.php";
 
+session_start();
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit;
+}
+
+$toast = $_SESSION['toast'] ?? null;
+unset($_SESSION['toast']);
+
 $tugas   = new TugasModel();
-$data    = $tugas->tampilTugas();
+$user_id = $_SESSION['user_id'];
+
+$data = $tugas->tampilTugas($user_id);
 
 $all_rows = [];
 while($r = $data->fetch_assoc()) $all_rows[] = $r;
@@ -12,15 +23,27 @@ $selesai = count(array_filter($all_rows, fn($r) => $r['status_tugas'] === 'Seles
 $belum   = $total - $selesai;
 $pct     = $total > 0 ? round(($selesai/$total)*100) : 0;
 
-$palettes = [
-    ['bg'=>'#ffd4e8','ink'=>'#c1006b'],
-    ['bg'=>'#d4eaff','ink'=>'#0055c1'],
-    ['bg'=>'#d4ffea','ink'=>'#006b38'],
-    ['bg'=>'#fff3d4','ink'=>'#b87200'],
-    ['bg'=>'#ead4ff','ink'=>'#6b00c1'],
-    ['bg'=>'#ffd4d4','ink'=>'#c10000'],
-    ['bg'=>'#d4fff3','ink'=>'#008b8b'],
-    ['bg'=>'#fff0d4','ink'=>'#c16b00'],
+$priority_palettes = [
+
+    'tinggi' => [
+        'bg'  => '#ffd4d4',
+        'ink' => '#c10000'
+    ],
+
+    'sedang' => [
+        'bg'  => '#fff3d4',
+        'ink' => '#b87200'
+    ],
+
+    'rendah' => [
+        'bg'  => '#d4ffea',
+        'ink' => '#006b38'
+    ],
+
+    'default' => [
+        'bg'  => '#d4eaff',
+        'ink' => '#0055c1'
+    ]
 ];
 
 $shapes = ['●','▲','■','◆','★','▶','✦','◉'];
@@ -39,9 +62,7 @@ $category_colors = [
     'lainnya'   => '#b87200',
 ];
 
-session_start();
-$toast = $_SESSION['toast'] ?? null;
-unset($_SESSION['toast']);
+// session_start();
 
 ?><!DOCTYPE html>
 <html lang="id">
@@ -53,7 +74,7 @@ unset($_SESSION['toast']);
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Anybody:wght@300;400;600;700;800;900&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="css/index.css">
 </head>
 <body>
 
@@ -146,6 +167,9 @@ unset($_SESSION['toast']);
         <a href="hapus_selesai.php"
            onclick="return confirm('Hapus semua tugas selesai?')"
            class="btn-hapus-selesai">✓ Hapus yang Selesai</a>
+        <a href="logout.php"
+           onclick="return confirm('Yakin ingin logout?')"
+           class="btn-logout">⎋ Logout</a>
     </div>
 
     <div class="sidebar-spacer"></div>
@@ -204,16 +228,6 @@ unset($_SESSION['toast']);
                 </button>
             </div>
 
-            <div class="sort-wrap">
-                <span class="sort-label">Urut</span>
-                <select class="sort-select" id="sortSelect">
-                    <option value="default">Default</option>
-                    <option value="az">A–Z</option>
-                    <option value="za">Z–A</option>
-                    <option value="due">Deadline</option>
-                    <option value="priority">Prioritas</option>
-                </select>
-            </div>
         </div>
 
         <div class="section-head">
@@ -231,8 +245,10 @@ unset($_SESSION['toast']);
             <?php else: ?>
                 <?php foreach($all_rows as $i => $row):
                     $done  = $row['status_tugas'] === 'Selesai';
-                    $pal   = $palettes[$i % count($palettes)];
-                    $shape = $shapes[$i % count($shapes)];
+                    $prio = $row['prioritas'] ?? '';
+                    $pal = $priority_palettes[$prio]
+                        ?? $priority_palettes['default'];
+                    $shape = $shapes[$row['id'] % count($shapes)];
                     $delay = $i * 0.055;
                     $nama  = htmlspecialchars($row['nama_tugas']);
 
@@ -296,12 +312,6 @@ unset($_SESSION['toast']);
                         <?php endif; ?>
 
                         <div class="card-title"><?= $nama ?></div>
-                        <input
-                            class="card-edit-input"
-                            type="text"
-                            value="<?= $nama ?>"
-                            data-id="<?= $row['id'] ?>"
-                        >
 
                         <div class="card-divider"></div>
 
@@ -325,8 +335,6 @@ unset($_SESSION['toast']);
                             <?php if(!$done): ?>
                             <a href="selesai.php?id=<?= $row['id'] ?>" class="card-btn ok">✓ Done</a>
                             <?php endif; ?>
-                            <button class="card-btn edit" onclick="startEdit(this)">✎ Edit</button>
-                            <button class="card-btn save" onclick="saveEdit(this, <?= $row['id'] ?>)">✓ Simpan</button>
                             <a href="hapus.php?id=<?= $row['id'] ?>" class="card-btn rm"
                                onclick="return confirm('Hapus tugas ini?')">✕ Hapus</a>
                         </div>
@@ -357,6 +365,6 @@ const pct = <?= $pct ?>;
 const totalTask = <?= $total ?>;
 </script>
 
-<script src="script.js"></script>
+<script src="js/index.js"></script>
 </body>
 </html>

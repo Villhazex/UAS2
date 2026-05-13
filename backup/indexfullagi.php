@@ -1,5 +1,10 @@
 <?php
+session_start();
 
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit;
+}
 require_once "class/TugasModel.php";
 
 $tugas   = new TugasModel();
@@ -12,15 +17,27 @@ $selesai = count(array_filter($all_rows, fn($r) => $r['status_tugas'] === 'Seles
 $belum   = $total - $selesai;
 $pct     = $total > 0 ? round(($selesai/$total)*100) : 0;
 
-$palettes = [
-    ['bg'=>'#ffd4e8','ink'=>'#c1006b'],
-    ['bg'=>'#d4eaff','ink'=>'#0055c1'],
-    ['bg'=>'#d4ffea','ink'=>'#006b38'],
-    ['bg'=>'#fff3d4','ink'=>'#b87200'],
-    ['bg'=>'#ead4ff','ink'=>'#6b00c1'],
-    ['bg'=>'#ffd4d4','ink'=>'#c10000'],
-    ['bg'=>'#d4fff3','ink'=>'#008b8b'],
-    ['bg'=>'#fff0d4','ink'=>'#c16b00'],
+$priority_palettes = [
+
+    'tinggi' => [
+        'bg'  => '#ffd4d4',
+        'ink' => '#c10000'
+    ],
+
+    'sedang' => [
+        'bg'  => '#fff3d4',
+        'ink' => '#b87200'
+    ],
+
+    'rendah' => [
+        'bg'  => '#d4ffea',
+        'ink' => '#006b38'
+    ],
+
+    'default' => [
+        'bg'  => '#d4eaff',
+        'ink' => '#0055c1'
+    ]
 ];
 
 $shapes = ['●','▲','■','◆','★','▶','✦','◉'];
@@ -49,11 +66,13 @@ unset($_SESSION['toast']);
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Tugas — Zine Edition</title>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Anybody:wght@300;400;600;700;800;900&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
-<style>
 
-:root {
+<!-- <link rel="stylesheet" href="css/index.css"> -->
+ <style>
+    :root {
     --bg:     #f0ebe2;
     --ink:    #1a1208;
     --cream:  #faf6ee;
@@ -141,13 +160,13 @@ body {
 }
 .prog-svg { flex-shrink: 0; }
 .prog-track { fill: none; stroke: rgba(255,255,255,0.08); stroke-width: 6; }
-.prog-fill  {
+.prog-fill {
     fill: none;
     stroke: var(--deco3);
     stroke-width: 6;
     stroke-linecap: butt;
     stroke-dasharray: 188;
-    stroke-dashoffset: <?= 188 - round(1.88 * $pct) ?>;
+    stroke-dashoffset: 188;
     transform-origin: center;
     transform: rotate(-90deg);
     transition: stroke-dashoffset 1s ease;
@@ -303,7 +322,8 @@ body {
 }
 
 .btn-hapus-semua,
-.btn-hapus-selesai {
+.btn-hapus-selesai,
+.btn-logout {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -330,6 +350,12 @@ body {
     color: var(--cream);
 }
 .btn-hapus-selesai:hover { background: var(--deco3); color: var(--ink); }
+.btn-logout {
+    background: rgba(255,255,255,0.06);
+    color: rgba(250,246,238,0.5);
+    border: 1.5px solid rgba(255,255,255,0.1);
+}
+.btn-logout:hover { background: rgba(193,0,0,0.75); color: #fff; border-color: transparent; }
 
 .sidebar-spacer { flex: 1; }
 
@@ -392,7 +418,7 @@ body {
 .sticky-bar-fill {
     height: 100%;
     background: var(--deco3);
-    width: <?= $pct ?>%;
+    width: 0%;
     transition: width 1s ease;
     position: relative;
     overflow: hidden;
@@ -531,34 +557,6 @@ body {
     border-radius: 50%;
     flex-shrink: 0;
 }
-
-.sort-wrap {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-.sort-label {
-    font-size: 9px;
-    font-weight: 700;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    opacity: 0.35;
-    color: var(--ink);
-}
-.sort-select {
-    border: 2px solid var(--ink);
-    background: transparent;
-    color: var(--ink);
-    font-family: 'Anybody', sans-serif;
-    font-size: 11px;
-    font-weight: 700;
-    padding: 8px 10px;
-    outline: none;
-    cursor: pointer;
-    opacity: 0.75;
-    transition: opacity 0.15s;
-}
-.sort-select:hover { opacity: 1; }
 
 .section-head {
     display: flex;
@@ -926,8 +924,7 @@ body {
     .toolbar { gap: 8px; }
     .filter-tab { padding: 8px 10px; font-size: 10px; }
 }
-
-</style>
+ </style>
 </head>
 <body>
 
@@ -1020,6 +1017,9 @@ body {
         <a href="hapus_selesai.php"
            onclick="return confirm('Hapus semua tugas selesai?')"
            class="btn-hapus-selesai">✓ Hapus yang Selesai</a>
+        <a href="logout.php"
+           onclick="return confirm('Yakin ingin logout?')"
+           class="btn-logout">⎋ Logout</a>
     </div>
 
     <div class="sidebar-spacer"></div>
@@ -1078,16 +1078,6 @@ body {
                 </button>
             </div>
 
-            <div class="sort-wrap">
-                <span class="sort-label">Urut</span>
-                <select class="sort-select" id="sortSelect">
-                    <option value="default">Default</option>
-                    <option value="az">A–Z</option>
-                    <option value="za">Z–A</option>
-                    <option value="due">Deadline</option>
-                    <option value="priority">Prioritas</option>
-                </select>
-            </div>
         </div>
 
         <div class="section-head">
@@ -1105,8 +1095,10 @@ body {
             <?php else: ?>
                 <?php foreach($all_rows as $i => $row):
                     $done  = $row['status_tugas'] === 'Selesai';
-                    $pal   = $palettes[$i % count($palettes)];
-                    $shape = $shapes[$i % count($shapes)];
+                    $prio = $row['prioritas'] ?? '';
+                    $pal = $priority_palettes[$prio]
+                        ?? $priority_palettes['default'];
+                    $shape = $shapes[$row['id'] % count($shapes)];
                     $delay = $i * 0.055;
                     $nama  = htmlspecialchars($row['nama_tugas']);
 
@@ -1170,12 +1162,6 @@ body {
                         <?php endif; ?>
 
                         <div class="card-title"><?= $nama ?></div>
-                        <input
-                            class="card-edit-input"
-                            type="text"
-                            value="<?= $nama ?>"
-                            data-id="<?= $row['id'] ?>"
-                        >
 
                         <div class="card-divider"></div>
 
@@ -1199,8 +1185,6 @@ body {
                             <?php if(!$done): ?>
                             <a href="selesai.php?id=<?= $row['id'] ?>" class="card-btn ok">✓ Done</a>
                             <?php endif; ?>
-                            <button class="card-btn edit" onclick="startEdit(this)">✎ Edit</button>
-                            <button class="card-btn save" onclick="saveEdit(this, <?= $row['id'] ?>)">✓ Simpan</button>
                             <a href="hapus.php?id=<?= $row['id'] ?>" class="card-btn rm"
                                onclick="return confirm('Hapus tugas ini?')">✕ Hapus</a>
                         </div>
@@ -1227,173 +1211,307 @@ document.addEventListener('DOMContentLoaded', () => showToast(<?= json_encode($t
 <?php endif; ?>
 
 <script>
+const pct = <?= $pct ?>;
+const totalTask = <?= $total ?>;
+</script>
 
-/* ─── TOAST ─── */
+<script>
+    /* ─── TOAST ─── */
 function showToast(msg, type = 'ok') {
     const c = document.getElementById('toastContainer');
     const t = document.createElement('div');
+
     t.className = 'toast' + (type === 'error' ? ' error' : '');
     t.textContent = msg;
+
     c.appendChild(t);
+
     setTimeout(() => t.remove(), 3300);
 }
 
 /* ─── FILTER + SEARCH + SORT + PRIORITY FILTER ─── */
-const searchInput     = document.getElementById('searchInput');
-const filterTabs      = document.querySelectorAll('.filter-tab');
-const sortSelect      = document.getElementById('sortSelect');
-const priorityBtns    = document.querySelectorAll('.priority-dot-btn');
-const cardGrid        = document.getElementById('cardGrid');
-const noResults       = document.getElementById('noResults');
+
+const searchInput  = document.getElementById('searchInput');
+const filterTabs   = document.querySelectorAll('.filter-tab');
+const priorityBtns = document.querySelectorAll('.priority-dot-btn');
+const cardGrid     = document.getElementById('cardGrid');
+const noResults    = document.getElementById('noResults');
+
+stickyFill.style.width = pct + '%';
+
+const progCircle = document.querySelector('.prog-fill');
+
+const offset = 188 - (1.88 * pct);
+
+progCircle.style.strokeDashoffset = offset;
 
 let currentFilter = 'all';
 let currentPrio   = 'all';
 
 function applyFilters() {
+
     const query = searchInput.value.toLowerCase().trim();
-    const sort  = sortSelect.value;
+
     const cards = [...cardGrid.querySelectorAll('.task-card')];
 
-    // Sort
-    if (sort !== 'default') {
-        const sorted = [...cards].sort((a, b) => {
-            if (sort === 'az')       return a.dataset.name.localeCompare(b.dataset.name);
-            if (sort === 'za')       return b.dataset.name.localeCompare(a.dataset.name);
-            if (sort === 'due') {
-                const da = a.dataset.due || '9999-99-99';
-                const db = b.dataset.due || '9999-99-99';
-                return da.localeCompare(db);
-            }
-            if (sort === 'priority') {
-                return parseInt(a.dataset.prioOrder||3) - parseInt(b.dataset.prioOrder||3);
-            }
-        });
-        sorted.forEach(c => cardGrid.appendChild(c));
-    }
-
     let visible = 0;
+
     cards.forEach(card => {
-        const matchFilter   = currentFilter === 'all' ||
-            (currentFilter === 'done'    && card.dataset.status === 'done') ||
-            (currentFilter === 'pending' && card.dataset.status === 'pending');
-        const matchSearch   = card.dataset.name.includes(query);
-        const matchPrio     = currentPrio === 'all' || card.dataset.prio === currentPrio;
+
+        const matchFilter =
+            currentFilter === 'all' ||
+            (currentFilter === 'done' &&
+                card.dataset.status === 'done') ||
+            (currentFilter === 'pending' &&
+                card.dataset.status === 'pending');
+
+        const matchSearch =
+            card.dataset.name.includes(query);
+
+        const matchPrio =
+            currentPrio === 'all' ||
+            card.dataset.prio === currentPrio;
 
         if (matchFilter && matchSearch && matchPrio) {
+
             card.classList.remove('hidden-card');
             visible++;
+
         } else {
+
             card.classList.add('hidden-card');
         }
     });
 
-    noResults.classList.toggle('show', visible === 0 && cards.length > 0);
+    noResults.classList.toggle(
+        'show',
+        visible === 0 && cards.length > 0
+    );
 }
 
+/* FILTER TAB */
+
 filterTabs.forEach(tab => {
+
     tab.addEventListener('click', () => {
-        filterTabs.forEach(t => t.classList.remove('active'));
+
+        filterTabs.forEach(t =>
+            t.classList.remove('active')
+        );
+
         tab.classList.add('active');
+
         currentFilter = tab.dataset.filter;
+
         applyFilters();
     });
 });
 
+/* PRIORITY FILTER */
+
 priorityBtns.forEach(btn => {
+
     btn.addEventListener('click', () => {
-        priorityBtns.forEach(b => b.classList.remove('active'));
+
+        priorityBtns.forEach(b =>
+            b.classList.remove('active')
+        );
+
         btn.classList.add('active');
+
         currentPrio = btn.dataset.prio;
+
         applyFilters();
     });
 });
 
 searchInput.addEventListener('input', applyFilters);
-sortSelect.addEventListener('change', applyFilters);
 
 /* ─── INLINE EDIT ─── */
+
 function startEdit(btn) {
+
     const card    = btn.closest('.task-card');
     const title   = card.querySelector('.card-title');
     const input   = card.querySelector('.card-edit-input');
     const saveBtn = card.querySelector('.card-btn.save');
-    title.style.display  = 'none';
-    input.style.display  = 'block';
-    input.focus(); input.select();
+
+    title.style.display = 'none';
+    input.style.display = 'block';
+
+    input.focus();
+    input.select();
+
     saveBtn.style.display = 'inline-flex';
-    btn.style.display     = 'none';
+
+    btn.style.display = 'none';
 }
 
 function saveEdit(btn, id) {
+
     const card    = btn.closest('.task-card');
+
     const title   = card.querySelector('.card-title');
+
     const input   = card.querySelector('.card-edit-input');
-    const editBtn = card.querySelector('.card-btn.edit');
+
     const newVal  = input.value.trim();
-    if (!newVal) { showToast('Nama tugas tidak boleh kosong!','error'); return; }
+
+    if (!newVal) {
+
+        showToast(
+            'Nama tugas tidak boleh kosong!',
+            'error'
+        );
+
+        return;
+    }
 
     fetch(`edit.php?id=${id}&nama=${encodeURIComponent(newVal)}`)
+
         .then(r => r.json())
+
         .then(d => {
+
             if (d.ok) {
-                title.textContent  = newVal;
-                card.dataset.name  = newVal.toLowerCase();
-                input.value        = newVal;
+
+                title.textContent = newVal;
+
+                card.dataset.name = newVal.toLowerCase();
+
+                input.value = newVal;
+
                 showToast('✓ Tugas berhasil diubah');
+
             } else {
-                showToast('Gagal menyimpan','error');
+
+                showToast('Gagal menyimpan', 'error');
             }
         })
-        .catch(() => showToast('Gagal menyimpan','error'));
 
-    title.style.display   = '';
-    input.style.display   = 'none';
-    btn.style.display     = 'none';
+        .catch(() =>
+            showToast('Gagal menyimpan', 'error')
+        );
+
+    title.style.display = '';
+
+    input.style.display = 'none';
+
+    btn.style.display = 'none';
+
     editBtn.style.display = 'inline-flex';
 }
 
 /* ─── CONFETTI ─── */
-const pct = <?= $pct ?>;
-if (pct === 100 && <?= $total ?> > 0) setTimeout(() => launchConfetti(), 400);
 
-function launchConfetti() {
-    const canvas = document.getElementById('confetti-canvas');
-    canvas.classList.add('active');
-    const ctx = canvas.getContext('2d');
-    canvas.width  = window.innerWidth;
-    canvas.height = window.innerHeight;
-    const colors = ['#ff5c8a','#3366ff','#00cc77','#ffd166','#c1006b','#6699ff'];
-    const bits = Array.from({length: 120}, () => ({
-        x: Math.random() * canvas.width,
-        y: -20 - Math.random() * 200,
-        w: 6 + Math.random() * 10,
-        h: 8 + Math.random() * 6,
-        r: Math.random() * Math.PI * 2,
-        dr: (Math.random() - 0.5) * 0.15,
-        vx: (Math.random() - 0.5) * 3,
-        vy: 2 + Math.random() * 3,
-        c: colors[Math.floor(Math.random() * colors.length)]
-    }));
-    let frame = 0;
-    function draw() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        bits.forEach(b => {
-            ctx.save();
-            ctx.translate(b.x, b.y);
-            ctx.rotate(b.r);
-            ctx.fillStyle = b.c;
-            ctx.fillRect(-b.w/2, -b.h/2, b.w, b.h);
-            ctx.restore();
-            b.x += b.vx; b.y += b.vy; b.r += b.dr;
-        });
-        frame++;
-        if (frame < 140) requestAnimationFrame(draw);
-        else { canvas.classList.remove('active'); ctx.clearRect(0,0,canvas.width,canvas.height); }
-    }
-    draw();
-    showToast('🎉 Semua tugas selesai! Luar biasa!');
+if (pct === 100 && totalTask > 0) {
+
+    setTimeout(() => launchConfetti(), 400);
 }
 
+function launchConfetti() {
+
+    const canvas = document.getElementById('confetti-canvas');
+
+    canvas.classList.add('active');
+
+    const ctx = canvas.getContext('2d');
+
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const colors = [
+        '#ff5c8a',
+        '#3366ff',
+        '#00cc77',
+        '#ffd166',
+        '#c1006b',
+        '#6699ff'
+    ];
+
+    const bits = Array.from({ length: 120 }, () => ({
+
+        x: Math.random() * canvas.width,
+
+        y: -20 - Math.random() * 200,
+
+        w: 6 + Math.random() * 10,
+
+        h: 8 + Math.random() * 6,
+
+        r: Math.random() * Math.PI * 2,
+
+        dr: (Math.random() - 0.5) * 0.15,
+
+        vx: (Math.random() - 0.5) * 3,
+
+        vy: 2 + Math.random() * 3,
+
+        c: colors[
+            Math.floor(Math.random() * colors.length)
+        ]
+    }));
+
+    let frame = 0;
+
+    function draw() {
+
+        ctx.clearRect(
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+        bits.forEach(b => {
+
+            ctx.save();
+
+            ctx.translate(b.x, b.y);
+
+            ctx.rotate(b.r);
+
+            ctx.fillStyle = b.c;
+
+            ctx.fillRect(
+                -b.w / 2,
+                -b.h / 2,
+                b.w,
+                b.h
+            );
+
+            ctx.restore();
+
+            b.x += b.vx;
+            b.y += b.vy;
+            b.r += b.dr;
+        });
+
+        frame++;
+
+        if (frame < 140) {
+
+            requestAnimationFrame(draw);
+
+        } else {
+
+            canvas.classList.remove('active');
+
+            ctx.clearRect(
+                0,
+                0,
+                canvas.width,
+                canvas.height
+            );
+        }
+    }
+
+    draw();
+
+    showToast(
+        '🎉 Semua tugas selesai! Luar biasa!'
+    );
+}
 </script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-/* ─── TOAST ─── */
+    /* ─── TOAST ─── */
 function showToast(msg, type = 'ok') {
     const c = document.getElementById('toastContainer');
     const t = document.createElement('div');
@@ -15,12 +15,17 @@ function showToast(msg, type = 'ok') {
 
 const searchInput  = document.getElementById('searchInput');
 const filterTabs   = document.querySelectorAll('.filter-tab');
-const sortSelect   = document.getElementById('sortSelect');
 const priorityBtns = document.querySelectorAll('.priority-dot-btn');
 const cardGrid     = document.getElementById('cardGrid');
 const noResults    = document.getElementById('noResults');
 
 stickyFill.style.width = pct + '%';
+
+const progCircle = document.querySelector('.prog-fill');
+
+const offset = 188 - (1.88 * pct);
+
+progCircle.style.strokeDashoffset = offset;
 
 let currentFilter = 'all';
 let currentPrio   = 'all';
@@ -28,40 +33,8 @@ let currentPrio   = 'all';
 function applyFilters() {
 
     const query = searchInput.value.toLowerCase().trim();
-    const sort  = sortSelect.value;
 
     const cards = [...cardGrid.querySelectorAll('.task-card')];
-
-    // SORT
-    if (sort !== 'default') {
-
-        const sorted = [...cards].sort((a, b) => {
-
-            if (sort === 'az') {
-                return a.dataset.name.localeCompare(b.dataset.name);
-            }
-
-            if (sort === 'za') {
-                return b.dataset.name.localeCompare(a.dataset.name);
-            }
-
-            if (sort === 'due') {
-
-                const da = a.dataset.due || '9999-99-99';
-                const db = b.dataset.due || '9999-99-99';
-
-                return da.localeCompare(db);
-            }
-
-            if (sort === 'priority') {
-
-                return parseInt(a.dataset.prioOrder || 3)
-                    - parseInt(b.dataset.prioOrder || 3);
-            }
-        });
-
-        sorted.forEach(c => cardGrid.appendChild(c));
-    }
 
     let visible = 0;
 
@@ -136,8 +109,6 @@ priorityBtns.forEach(btn => {
 
 searchInput.addEventListener('input', applyFilters);
 
-sortSelect.addEventListener('change', applyFilters);
-
 /* ─── INLINE EDIT ─── */
 
 function startEdit(btn) {
@@ -165,8 +136,6 @@ function saveEdit(btn, id) {
     const title   = card.querySelector('.card-title');
 
     const input   = card.querySelector('.card-edit-input');
-
-    const editBtn = card.querySelector('.card-btn.edit');
 
     const newVal  = input.value.trim();
 

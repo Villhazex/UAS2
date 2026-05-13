@@ -314,7 +314,7 @@ unset($_SESSION['register_error'], $_SESSION['register_success']);
             <button class="form-submit" type="submit" id="submitBtn" disabled>
                 ✦ Buat Akun Sekarang
             </button>
-s
+
         </form>
 
         <div class="divider">
