@@ -1,6 +1,13 @@
 <?php
 
+session_start();
+
 require_once "class/TugasModel.php";
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit;
+}
 
 if(isset($_GET['id'])) {
 
@@ -8,9 +15,10 @@ if(isset($_GET['id'])) {
 
     $tugas = new TugasModel();
 
-    $tugas->selesaiTugas($id);
+    $tugas->selesaiTugas($id, $_SESSION['user_id']);
 
-    header("Location: index.php");
+    header("Location: dashboard.php");
+    exit;
 }
 
 ?>

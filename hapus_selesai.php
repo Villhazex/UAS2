@@ -10,7 +10,7 @@ $tugas = new TugasModel();
 
 $tugas->hapusSelesai($user_id);
 
-header("Location: index.php");
+header("Location: dashboard.php");
 
 exit;
 ?>

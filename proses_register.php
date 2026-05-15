@@ -4,113 +4,88 @@ session_start();
 
 require_once "config/database.php";
 
-/* koneksi database */
 $db = new Database();
 $conn = $db->connect();
 
-/* ambil data */
-$nama_depan    = trim($_POST['nama_depan']);
-$nama_belakang = trim($_POST['nama_belakang']);
-$username      = trim($_POST['username']);
-$email         = trim($_POST['email']);
-$password      = $_POST['password'];
-$confirm       = $_POST['confirm_password'];
-
-/* validasi kosong */
-if (
-    empty($nama_depan) ||
-    empty($username) ||
-    empty($email) ||
-    empty($password) ||
-    empty($confirm)
-) {
-
-    $_SESSION['register_error'] =
-    "Semua field wajib diisi.";
-
+function redirectRegister($message) {
+    $_SESSION['register_error'] = $message;
     header("Location: register.php");
     exit;
 }
 
-/* cek password */
+function ensureRegisterSchema($conn) {
+    $conn->query("
+        CREATE TABLE IF NOT EXISTS users (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            username VARCHAR(50) NOT NULL UNIQUE,
+            email VARCHAR(120) NOT NULL UNIQUE,
+            password VARCHAR(255) NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ");
+}
+
+ensureRegisterSchema($conn);
+
+$username = trim($_POST['username'] ?? '');
+$email = trim($_POST['email'] ?? '');
+$password = $_POST['password'] ?? '';
+$confirm = $_POST['confirm_password'] ?? '';
+
+if ($username === '' || $email === '' || $password === '' || $confirm === '') {
+    redirectRegister("Username, email, password, dan konfirmasi password wajib diisi.");
+}
+
+if (strlen($username) < 3 || preg_match('/\s/', $username)) {
+    redirectRegister("Username minimal 3 karakter dan tidak boleh memakai spasi.");
+}
+
+if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    redirectRegister("Format email tidak valid.");
+}
+
+if (!preg_match('/^(?=.*[A-Za-z])(?=.*\d).{8,}$/', $password)) {
+    redirectRegister("Password minimal 8 karakter dan harus berisi huruf serta angka.");
+}
+
 if ($password !== $confirm) {
-
-    $_SESSION['register_error'] =
-    "Konfirmasi password tidak cocok.";
-
-    header("Location: register.php");
-    exit;
+    redirectRegister("Konfirmasi password tidak cocok.");
 }
 
-/* cek username */
-$cekUsername = $conn->query(
-    "SELECT id FROM users WHERE username='$username'"
-);
+$stmt = $conn->prepare("SELECT id FROM users WHERE username = ? LIMIT 1");
+$stmt->bind_param("s", $username);
+$stmt->execute();
+$cekUsername = $stmt->get_result();
 
 if ($cekUsername->num_rows > 0) {
-
-    $_SESSION['register_error'] =
-    "Username sudah digunakan.";
-
-    header("Location: register.php");
-    exit;
+    redirectRegister("Username sudah digunakan.");
 }
 
-/* cek email */
-$cekEmail = $conn->query(
-    "SELECT id FROM users WHERE email='$email'"
-);
+$stmt = $conn->prepare("SELECT id FROM users WHERE email = ? LIMIT 1");
+$stmt->bind_param("s", $email);
+$stmt->execute();
+$cekEmail = $stmt->get_result();
 
 if ($cekEmail->num_rows > 0) {
-
-    $_SESSION['register_error'] =
-    "Email sudah digunakan.";
-
-    header("Location: register.php");
-    exit;
+    redirectRegister("Email sudah digunakan.");
 }
 
-/* hash password */
-$passwordHash = password_hash(
-    $password,
-    PASSWORD_DEFAULT
-);
+$passwordHash = password_hash($password, PASSWORD_DEFAULT);
 
-/* query insert */
-$query = "
-INSERT INTO users
-(
-    nama_depan,
-    nama_belakang,
-    username,
-    email,
-    password
-)
+$stmt = $conn->prepare("
+    INSERT INTO users (username, email, password)
+    VALUES (?, ?, ?)
+");
+$stmt->bind_param("sss", $username, $email, $passwordHash);
+$insert = $stmt->execute();
 
-VALUES
-(
-    '$nama_depan',
-    '$nama_belakang',
-    '$username',
-    '$email',
-    '$passwordHash'
-)
-";
-
-/* jalankan query */
-$insert = $conn->query($query);
-
-/* hasil */
 if ($insert) {
-
-    $_SESSION['register_success'] =
-    "Registrasi berhasil.";
-
+    $_SESSION['register_success'] = "Registrasi berhasil.";
 } else {
-
-    $_SESSION['register_error'] =
-    "Registrasi gagal.";
+    $_SESSION['register_error'] = "Registrasi gagal.";
 }
 
 header("Location: register.php");
 exit;
+
+?>

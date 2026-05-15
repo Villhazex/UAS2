@@ -1,216 +1,88 @@
-/* ── PASSWORD TOGGLE ── */
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('regForm');
+    const usernameInput = document.getElementById('username');
+    const emailInput = document.getElementById('email');
+    const pwInput = document.getElementById('password');
+    const confirmInput = document.getElementById('confirm_password');
+    const matchHint = document.getElementById('matchHint');
 
-function makePwToggle(toggleId, inputId) {
+    function makePwToggle(toggleId, inputId) {
+        const btn = document.getElementById(toggleId);
+        const input = document.getElementById(inputId);
 
-    const btn   = document.getElementById(toggleId);
-    const input = document.getElementById(inputId);
+        if (!btn || !input) return;
 
-    btn.addEventListener('click', () => {
+        btn.textContent = 'Show';
+        btn.addEventListener('click', () => {
+            const show = input.type === 'password';
+            input.type = show ? 'text' : 'password';
+            btn.textContent = show ? 'Hide' : 'Show';
+        });
+    }
 
-        const show = input.type === 'password';
+    function passwordOk(value) {
+        return value.length >= 8 && /[A-Za-z]/.test(value) && /\d/.test(value);
+    }
 
-        input.type = show ? 'text' : 'password';
+    function emailOk(value) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+    }
 
-        btn.textContent = show ? '🙈' : '👁';
+    function usernameOk(value) {
+        return value.length >= 3 && !/\s/.test(value);
+    }
+
+    function setState(input, ok) {
+        input.classList.toggle('valid', ok && input.value.length > 0);
+        input.classList.toggle('invalid', !ok && input.value.length > 0);
+    }
+
+    function validate(showMessage = false) {
+        const unameValid = usernameOk(usernameInput.value.trim());
+        const emailValid = emailOk(emailInput.value.trim());
+        const passwordValid = passwordOk(pwInput.value);
+        const matchValid = confirmInput.value === pwInput.value && confirmInput.value.length > 0;
+
+        setState(usernameInput, unameValid);
+        setState(emailInput, emailValid);
+        setState(pwInput, passwordValid);
+        setState(confirmInput, matchValid);
+
+        if (!confirmInput.value) {
+            matchHint.textContent = '';
+        } else {
+            matchHint.textContent = matchValid ? 'Password cocok' : 'Password tidak cocok';
+            matchHint.style.color = matchValid ? '#006b38' : '#c10000';
+        }
+
+        if (showMessage && !passwordValid) {
+            pwInput.setCustomValidity('Password minimal 8 karakter dan harus berisi huruf serta angka.');
+        } else {
+            pwInput.setCustomValidity('');
+        }
+
+        if (showMessage && !matchValid) {
+            confirmInput.setCustomValidity('Konfirmasi password tidak cocok.');
+        } else {
+            confirmInput.setCustomValidity('');
+        }
+
+        return unameValid && emailValid && passwordValid && matchValid;
+    }
+
+    makePwToggle('pwToggle1', 'password');
+    makePwToggle('pwToggle2', 'confirm_password');
+
+    [usernameInput, emailInput, pwInput, confirmInput].forEach((input) => {
+        input.addEventListener('input', () => validate(false));
     });
-}
 
-makePwToggle('pwToggle1', 'password');
-makePwToggle('pwToggle2', 'confirm_password');
+    form.addEventListener('submit', (event) => {
+        if (!validate(true)) {
+            event.preventDefault();
+            form.reportValidity();
+        }
+    });
 
-/* ── PASSWORD STRENGTH ── */
-
-const pwInput      = document.getElementById('password');
-const strengthFill = document.getElementById('strengthFill');
-const strengthLbl  = document.getElementById('strengthLabel');
-
-function calcStrength(pw) {
-
-    let score = 0;
-
-    if (pw.length >= 6) score++;
-    if (pw.length >= 10) score++;
-    if (/[A-Z]/.test(pw)) score++;
-    if (/[0-9]/.test(pw)) score++;
-    if (/[^A-Za-z0-9]/.test(pw)) score++;
-
-    return score;
-}
-
-const levels = [
-
-    {
-        pct: 0,
-        color: 'transparent',
-        label: 'Ketik password...'
-    },
-
-    {
-        pct: 20,
-        color: '#c10000',
-        label: 'Sangat lemah'
-    },
-
-    {
-        pct: 40,
-        color: '#ff5c8a',
-        label: 'Lemah'
-    },
-
-    {
-        pct: 60,
-        color: '#b87200',
-        label: 'Cukup'
-    },
-
-    {
-        pct: 80,
-        color: '#3366ff',
-        label: 'Kuat'
-    },
-
-    {
-        pct: 100,
-        color: '#00cc77',
-        label: 'Sangat kuat ✓'
-    }
-];
-
-pwInput.addEventListener('input', () => {
-
-    const score = pwInput.value
-        ? Math.max(1, calcStrength(pwInput.value))
-        : 0;
-
-    const lv = levels[score];
-
-    strengthFill.style.width = lv.pct + '%';
-    strengthFill.style.background = lv.color;
-
-    strengthLbl.textContent = lv.label;
-
-    strengthLbl.style.color =
-        lv.color === 'transparent'
-        ? 'rgba(26,18,8,0.3)'
-        : lv.color;
-
-    validate();
+    validate(false);
 });
-
-/* ── CONFIRM PASSWORD ── */
-
-const confirmInput = document.getElementById('confirm_password');
-const matchHint    = document.getElementById('matchHint');
-
-confirmInput.addEventListener('input', () => {
-
-    if (!confirmInput.value) {
-
-        matchHint.textContent = '';
-        return;
-    }
-
-    const match = confirmInput.value === pwInput.value;
-
-    matchHint.textContent =
-        match
-        ? '✓ Password cocok'
-        : '✕ Password tidak cocok';
-
-    matchHint.style.color =
-        match
-        ? '#006b38'
-        : '#c10000';
-
-    confirmInput.classList.toggle('valid', match);
-    confirmInput.classList.toggle('invalid', !match);
-
-    validate();
-});
-
-/* ── USERNAME VALIDATION ── */
-
-const usernameInput = document.getElementById('username');
-
-usernameInput.addEventListener('input', () => {
-
-    const val = usernameInput.value;
-
-    const ok = val.length >= 3 && !/\s/.test(val);
-
-    usernameInput.classList.toggle(
-        'valid',
-        ok && val.length > 0
-    );
-
-    usernameInput.classList.toggle(
-        'invalid',
-        !ok && val.length > 0
-    );
-
-    validate();
-});
-
-/* ── EMAIL VALIDATION ── */
-
-const emailInput = document.getElementById('email');
-
-emailInput.addEventListener('input', () => {
-
-    const ok =
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    .test(emailInput.value);
-
-    emailInput.classList.toggle('valid', ok);
-
-    emailInput.classList.toggle(
-        'invalid',
-        !ok && emailInput.value.length > 0
-    );
-
-    validate();
-});
-
-/* ── ENABLE SUBMIT ── */
-
-const termsCheck = document.getElementById('terms');
-const submitBtn  = document.getElementById('submitBtn');
-
-termsCheck.addEventListener('change', validate);
-
-function validate() {
-
-    const pwOk =
-        calcStrength(pwInput.value) >= 2;
-
-    const matchOk =
-        confirmInput.value === pwInput.value
-        &&
-        confirmInput.value.length > 0;
-
-    const unameOk =
-        usernameInput.value.length >= 3
-        &&
-        !/\s/.test(usernameInput.value);
-
-    const emailOk =
-        /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-        .test(emailInput.value);
-
-    const namaOk =
-        document.getElementById('nama_depan')
-        .value.trim().length > 0;
-
-    submitBtn.disabled = !(
-        pwOk &&
-        matchOk &&
-        unameOk &&
-        emailOk &&
-        namaOk &&
-        termsCheck.checked
-    );
-}
-
-document
-.getElementById('nama_depan')
-.addEventListener('input', validate);

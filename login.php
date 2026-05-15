@@ -139,7 +139,7 @@ unset($_SESSION['login_error']);
                         id="pwToggle"
                         title="Tampilkan password"
                     >
-                        👁
+                        Show
                     </button>
 
                 </div>
@@ -168,19 +168,9 @@ unset($_SESSION['login_error']);
     </div>
 </div>
 
-<script>
-const pwToggle = document.getElementById('pwToggle');
-const pwInput  = document.getElementById('password');
-
-pwToggle.addEventListener('click', () => {
-
-    const show = pwInput.type === 'password';
-
-    pwInput.type = show ? 'text' : 'password';
-
-    pwToggle.textContent = show ? '🙈' : '👁';
-});
-</script>
+<script src="js/login.js"></script>
 
 </body>
 </html>
+
+

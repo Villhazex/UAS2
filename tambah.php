@@ -25,5 +25,6 @@ if(isset($_POST['nama_tugas'])) {
 
     $tugas->tambahTugas();
 
-    header("Location: index.php");
+    header("Location: dashboard.php");
+    exit;
 }

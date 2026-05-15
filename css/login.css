@@ -36,7 +36,7 @@ body {
 /* ── LEFT PANEL ── */
 
 .panel-left {
-    width: 52%;
+    width: 42%;
     background: var(--ink);
     color: var(--cream);
 
@@ -134,7 +134,7 @@ body {
 .hero-title {
     font-family: 'DM Serif Display', serif;
 
-    font-size: clamp(52px, 6vw, 86px);
+    font-size: clamp(44px, 5vw, 72px);
 
     font-weight: 400;
 
@@ -250,14 +250,15 @@ body {
     align-items: center;
     justify-content: center;
 
-    padding: 56px 48px;
+    padding: 48px 48px;
+    overflow-y: auto;
 
     position: relative;
 }
 
 .form-wrap {
     width: 100%;
-    max-width: 420px;
+    max-width: 460px;
 
     animation: fadeUp 0.6s 0.25s both;
 }

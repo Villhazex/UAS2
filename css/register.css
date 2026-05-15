@@ -299,29 +299,6 @@ body {
 .pw-toggle:hover { opacity: 0.7; }
  
 /* ── STRENGTH BAR ── */
-.strength-wrap { margin-top: 6px; }
-.strength-bar {
-    height: 4px;
-    background: rgba(26,18,8,0.1);
-    position: relative;
-    overflow: hidden;
-}
-.strength-fill {
-    height: 100%;
-    width: 0%;
-    transition: width 0.3s ease, background 0.3s ease;
-}
-.strength-label {
-    font-size: 9px;
-    font-weight: 700;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    margin-top: 4px;
-    opacity: 0.5;
-    color: var(--ink);
-    transition: color 0.3s;
-}
- 
 /* ── HINT TEXT ── */
 .form-hint {
     font-size: 9px;

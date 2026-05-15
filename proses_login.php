@@ -4,65 +4,48 @@ session_start();
 
 require_once "config/database.php";
 
-/* koneksi database */
 $db = new Database();
 $conn = $db->connect();
 
-/* ambil data */
-$username = trim($_POST['username']);
-$password = $_POST['password'];
+$username = trim($_POST['username'] ?? '');
+$password = $_POST['password'] ?? '';
 
-/* validasi kosong */
-if (empty($username) || empty($password)) {
-
-    $_SESSION['login_error'] =
-    "Username dan password wajib diisi.";
-
+if ($username === '' || $password === '') {
+    $_SESSION['login_error'] = "Username dan password wajib diisi.";
     header("Location: login.php");
     exit;
 }
 
-/* cek user */
-$query = "
-SELECT * FROM users
-WHERE username='$username'
-LIMIT 1
-";
+$stmt = $conn->prepare("
+    SELECT id, username, password
+    FROM users
+    WHERE username = ?
+    LIMIT 1
+");
+$stmt->bind_param("s", $username);
+$stmt->execute();
+$result = $stmt->get_result();
 
-$result = $conn->query($query);
-
-/* kalau user ditemukan */
-if ($result->num_rows > 0) {
-
-    $user = $result->fetch_assoc();
-
-    /* verifikasi password */
-    if (password_verify($password, $user['password'])) {
-
-        /* simpan session */
-        $_SESSION['user_id'] = $user['id'];
-        $_SESSION['username'] = $user['username'];
-        $_SESSION['nama'] =
-        $user['nama_depan'];
-
-        /* redirect */
-        header("Location: index.php");
-        exit;
-
-    } else {
-
-        $_SESSION['login_error'] =
-        "Password salah.";
-
-        header("Location: login.php");
-        exit;
-    }
-
-} else {
-
-    $_SESSION['login_error'] =
-    "Username tidak ditemukan.";
-
+if ($result->num_rows === 0) {
+    $_SESSION['login_error'] = "Username tidak ditemukan.";
     header("Location: login.php");
     exit;
 }
+
+$user = $result->fetch_assoc();
+
+if (!password_verify($password, $user['password'])) {
+    $_SESSION['login_error'] = "Password salah.";
+    header("Location: login.php");
+    exit;
+}
+
+$_SESSION['user_id'] = $user['id'];
+$_SESSION['username'] = $user['username'];
+$_SESSION['nama'] = $user['username'];
+$_SESSION['user_name'] = $user['username'];
+
+header("Location: dashboard.php");
+exit;
+
+?>

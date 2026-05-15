@@ -59,10 +59,10 @@ unset($_SESSION['register_error'], $_SESSION['register_success']);
                 <div class="step-num">01</div>
 
                 <div class="step-content">
-                    <div class="step-title">Isi data diri</div>
+                    <div class="step-title">Buat identitas akun</div>
 
                     <div class="step-desc">
-                        Username, email, dan password yang kuat
+                        Username, email, dan password
                     </div>
                 </div>
             </div>
@@ -135,41 +135,6 @@ unset($_SESSION['register_error'], $_SESSION['register_success']);
 
             <div class="form-grid">
 
-                <!-- Nama Depan -->
-                <div class="form-group">
-
-                    <label class="form-label" for="nama_depan">
-                        Nama Depan
-                    </label>
-
-                    <input
-                        class="form-input"
-                        type="text"
-                        id="nama_depan"
-                        name="nama_depan"
-                        placeholder="nama depan..."
-                        required
-                        autocomplete="given-name"
-                    >
-                </div>
-
-                <!-- Nama Belakang -->
-                <div class="form-group">
-
-                    <label class="form-label" for="nama_belakang">
-                        Nama Belakang
-                    </label>
-
-                    <input
-                        class="form-input"
-                        type="text"
-                        id="nama_belakang"
-                        name="nama_belakang"
-                        placeholder="nama belakang..."
-                        autocomplete="family-name"
-                    >
-                </div>
-
                 <!-- Username -->
                 <div class="form-group full">
 
@@ -225,10 +190,11 @@ unset($_SESSION['register_error'], $_SESSION['register_success']);
                             type="password"
                             id="password"
                             name="password"
-                            placeholder="buat password yang kuat..."
+                            placeholder="minimal 8 karakter huruf dan angka..."
                             required
                             autocomplete="new-password"
-                            minlength="6"
+                            minlength="8"
+                            pattern="(?=.*[A-Za-z])(?=.*\d).{8,}"
                         >
 
                         <button
@@ -242,17 +208,9 @@ unset($_SESSION['register_error'], $_SESSION['register_success']);
 
                     </div>
 
-                    <div class="strength-wrap">
-
-                        <div class="strength-bar">
-                            <div class="strength-fill" id="strengthFill"></div>
-                        </div>
-
-                        <div class="strength-label" id="strengthLabel">
-                            Ketik password...
-                        </div>
-
-                    </div>
+                    <span class="form-hint">
+                        Minimal 8 karakter, gabungan huruf dan angka
+                    </span>
                 </div>
 
                 <!-- Confirm Password -->
@@ -290,28 +248,7 @@ unset($_SESSION['register_error'], $_SESSION['register_success']);
 
             </div>
 
-            <!-- Terms -->
-            <div class="terms-row">
-
-                <input
-                    type="checkbox"
-                    class="terms-checkbox"
-                    id="terms"
-                    name="terms"
-                    required
-                >
-
-                <label class="terms-text" for="terms">
-                    Dengan mendaftar, kamu menyetujui
-                    <a href="#">syarat &amp; ketentuan</a>
-                    serta
-                    <a href="#">kebijakan privasi</a>
-                    Luminous.
-                </label>
-
-            </div>
-
-            <button class="form-submit" type="submit" id="submitBtn" disabled>
+            <button class="form-submit" type="submit" id="submitBtn">
                 ✦ Buat Akun Sekarang
             </button>
 
