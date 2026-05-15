@@ -45,7 +45,7 @@ $_SESSION['username'] = $user['username'];
 $_SESSION['nama'] = $user['username'];
 $_SESSION['user_name'] = $user['username'];
 
-header("Location: dashboard.php");
+header("Location: index.php");
 exit;
 
 ?>

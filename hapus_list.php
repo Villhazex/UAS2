@@ -21,7 +21,7 @@ $_SESSION['toast'] = [
     'type' => $result['ok'] ? 'ok' : 'error',
 ];
 
-header("Location: dashboard.php");
+header("Location: index.php");
 exit;
 
 ?>

@@ -14,7 +14,7 @@ if(isset($_GET['id'])) {
 
     $tugas->hapusTugas($id, $user_id);
 
-    header("Location: dashboard.php");
+    header("Location: index.php");
 
     exit;
 }

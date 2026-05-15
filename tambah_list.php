@@ -28,7 +28,7 @@ if (isset($_POST['nama_list'])) {
     ];
 }
 
-header("Location: dashboard.php");
+header("Location: index.php");
 exit;
 
 ?>

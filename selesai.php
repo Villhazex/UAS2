@@ -17,7 +17,7 @@ if(isset($_GET['id'])) {
 
     $tugas->selesaiTugas($id, $_SESSION['user_id']);
 
-    header("Location: dashboard.php");
+    header("Location: index.php");
     exit;
 }
 
