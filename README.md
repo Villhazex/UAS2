@@ -3,6 +3,7 @@
   Project ini dibuat untuk membantu pengguna mengelola tugas harian dengan tampilan modern, sederhana, dan mudah digunakan.
 
 ![Preview LumiTask](image/image.png)
+
 ![Preview LumiTask](image/image2.png)
 
 ---
