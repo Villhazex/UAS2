@@ -1,4 +1,4 @@
-# LumiTask
+# To Do List
 
   Project ini dibuat untuk membantu pengguna mengelola tugas harian dengan tampilan modern, sederhana, dan mudah digunakan.
 
@@ -50,7 +50,7 @@ Project ini menggunakan beberapa konsep OOP seperti:
 
 ---
 
-## 🎯 Purpose
+## Purpose
 
 Project ini dibuat sebagai media pembelajaran dan implementasi konsep OOP PHP dalam pengembangan aplikasi task management sederhana.
 
