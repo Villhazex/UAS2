@@ -1,5 +1,4 @@
 <?php
-
 class Tugas {
 
     // Encapsulation: property dibuat protected agar child class bisa memakai,
