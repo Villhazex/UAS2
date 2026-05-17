@@ -12,27 +12,47 @@
 ## Project Structure
 
 ```bash
-UAS2/
-│
+UAS/
 ├── class/
 │   ├── Tugas.php
-│   └── TugasModel.php
+│   ├── TugasListManager.php
+│   ├── TugasListMembers.php
+│   ├── TugasModel.php
+│   └── TugasSchemaManager.php
 │
 ├── config/
 │   └── database.php
 │
 ├── css/
-├── js/
-├── image/
-│   └── image.png
+│   ├── dashboard.css
+│   ├── login.css
+│   └── register.css
 │
+├── image/
+│   ├── image.png
+│   └── image2.png
+│
+├── js/
+│   ├── dashboard.js
+│   ├── login.js
+│   └── register.js
+│
+├── edit_list.php
+├── hapus.php
+├── hapus_list.php
+├── hapus_selesai.php
+├── hapus_semua.php
 ├── index.php
 ├── login.php
-├── register.php
+├── logout.php
 ├── proses_login.php
 ├── proses_register.php
-├── logout.php
-└── README.md
+├── README.md
+├── register.php
+├── selesai.php
+├── sqlcommands.sql
+├── tambah.php
+└── tambah_list.php
 ```
 
 
