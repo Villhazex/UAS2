@@ -1,9 +1,8 @@
 <?php
 
-require_once __DIR__ . "/Tugas.php";
-require_once __DIR__ . "/../config/database.php";
-require_once __DIR__ . "/TugasSchemaManager.php";
-require_once __DIR__ . "/TugasListManager.php";
+require_once __DIR__.'/Tugas.php';
+require_once __DIR__.'/../config/database.php';
+require_once __DIR__.'/TugasListManager.php';
 
 /*
  * TugasModel — OOP tingkat "mudah"
@@ -11,18 +10,17 @@ require_once __DIR__ . "/TugasListManager.php";
  * Operasi list didelegasikan ke TugasListManager (OOP tingkat "susah").
  */
 
-class TugasModel extends Tugas {
-
+class TugasModel extends Tugas
+{
     private $conn;
-    private $database;
     private $listManager;
 
     public function __construct(
-        $namaTugas = "",
-        $statusTugas = "Belum Selesai",
+        $namaTugas = '',
+        $statusTugas = 'Belum Selesai',
         $dueDate = null,
-        $prioritas = "",
-        $kategori = "",
+        $prioritas = '',
+        $kategori = '',
         $userId = 0
     ) {
         parent::__construct(
@@ -34,19 +32,12 @@ class TugasModel extends Tugas {
             $userId
         );
 
-        // Inheritance: TugasModel mewarisi property tugas dari class Tugas,
-        // lalu menambahkan kemampuan database sebagai model.
-        $this->database = new Database();
-        $this->conn = $this->database->connect();
-        new TugasSchemaManager($this->conn);
+        $this->conn = connectDB();
         $this->listManager = new TugasListManager($this->conn);
     }
 
-    public function getDatabase() {
-        return $this->database;
-    }
-
-    public function getConn() {
+    public function getConn()
+    {
         return $this->conn;
     }
 
@@ -54,10 +45,13 @@ class TugasModel extends Tugas {
      * ─── CRUD Tugas — OOP "Mudah" ───
      */
 
-    public function tambahTugas() {
+    public function tambahTugas()
+    {
         $userId = (int) $this->userId;
         $listId = $this->listManager->resolveListId($userId, $this->kategori);
-        if (!$listId) return false;
+        if (!$listId) {
+            return false;
+        }
 
         $list = $this->conn->query("SELECT slug FROM task_lists WHERE id = $listId LIMIT 1");
         $listRow = $list ? $list->fetch_assoc() : null;
@@ -65,7 +59,7 @@ class TugasModel extends Tugas {
         $namaTugas = $this->conn->real_escape_string($this->namaTugas);
         $statusTugas = $this->conn->real_escape_string($this->statusTugas);
         $prioritas = $this->conn->real_escape_string($this->prioritas);
-        $dueDate = $this->dueDate ? "'" . $this->conn->real_escape_string($this->dueDate) . "'" : "NULL";
+        $dueDate = $this->dueDate ? "'".$this->conn->real_escape_string($this->dueDate)."'" : 'NULL';
 
         return $this->conn->query("
             INSERT INTO tugas (user_id, list_id, nama_tugas, status_tugas, due_date, prioritas, kategori)
@@ -73,7 +67,8 @@ class TugasModel extends Tugas {
         ");
     }
 
-    public function tampilTugas($user_id) {
+    public function tampilTugas($user_id)
+    {
         $user_id = (int) $user_id;
         $this->listManager->seedDefaultLists($user_id);
         $this->listManager->syncLegacyTasks($user_id);
@@ -101,7 +96,8 @@ class TugasModel extends Tugas {
         ");
     }
 
-    public function hapusTugas($id, $user_id) {
+    public function hapusTugas($id, $user_id)
+    {
         $id = (int) $id;
         $user_id = (int) $user_id;
 
@@ -116,7 +112,8 @@ class TugasModel extends Tugas {
         ");
     }
 
-    public function selesaiTugas($id, $user_id) {
+    public function selesaiTugas($id, $user_id)
+    {
         $id = (int) $id;
         $user_id = (int) $user_id;
 
@@ -132,7 +129,8 @@ class TugasModel extends Tugas {
         ");
     }
 
-    public function hapusSemua($user_id) {
+    public function hapusSemua($user_id)
+    {
         $user_id = (int) $user_id;
 
         return $this->conn->query("
@@ -142,7 +140,8 @@ class TugasModel extends Tugas {
         ");
     }
 
-    public function hapusSelesai($user_id) {
+    public function hapusSelesai($user_id)
+    {
         $user_id = (int) $user_id;
 
         return $this->conn->query("
@@ -157,19 +156,23 @@ class TugasModel extends Tugas {
      * ─── Proxy ke TugasListManager (OOP "Susah") ───
      */
 
-    public function tambahList($user_id, $nama_list, $jenis = 'pribadi', $member_usernames = []) {
+    public function tambahList($user_id, $nama_list, $jenis = 'pribadi', $member_usernames = [])
+    {
         return $this->listManager->tambahList($user_id, $nama_list, $jenis, $member_usernames);
     }
 
-    public function editList($user_id, $list_id, $nama_list, $jenis = 'pribadi', $member_usernames = []) {
+    public function editList($user_id, $list_id, $nama_list, $jenis = 'pribadi', $member_usernames = [])
+    {
         return $this->listManager->editList($user_id, $list_id, $nama_list, $jenis, $member_usernames);
     }
 
-    public function hapusList($user_id, $list_id) {
+    public function hapusList($user_id, $list_id)
+    {
         return $this->listManager->hapusList($user_id, $list_id);
     }
 
-    public function tampilLists($user_id) {
+    public function tampilLists($user_id)
+    {
         return $this->listManager->tampilLists($user_id);
     }
 }

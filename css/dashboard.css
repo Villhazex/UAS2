@@ -407,7 +407,7 @@ body {
 
 /* Category bars */
 .cat-list { padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; }
-.cat-row { }
+/* .cat-row { } */
 .cat-row-top {
     display: flex;
     align-items: center;

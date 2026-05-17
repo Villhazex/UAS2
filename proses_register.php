@@ -4,8 +4,7 @@ session_start();
 
 require_once "config/database.php";
 
-$db = new Database();
-$conn = $db->connect();
+$conn = connectDB();
 
 function redirectRegister($message) {
     $_SESSION['register_error'] = $message;

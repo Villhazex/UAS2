@@ -6,21 +6,21 @@ unset($_SESSION['login_error']);
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Login — Luminous Zine</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Login — Luminous Zine</title>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Anybody:wght@300;400;600;700;800;900&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Anybody:wght@300;400;600;700;800;900&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="css/login.css">
 </head>
 <body>
 
 <!-- ═══ LEFT PANEL ═══ -->
 <div class="panel-left">
     <div class="issue-tag">
-        ✦ Luminous &nbsp;·&nbsp; Vol. <?= date('Y') ?>
+        ✦ Luminous &nbsp;·&nbsp; Vol. <?php echo date('Y'); ?>
     </div>
 
     <div class="hero-text">
@@ -86,16 +86,16 @@ unset($_SESSION['login_error']);
         </div>
 
         <p class="form-sub">
-            <?= date('d M Y') ?>
+            <?php echo date('d M Y'); ?>
             &nbsp;·&nbsp;
             Mulai produktif hari ini
         </p>
 
-        <?php if($error): ?>
+        <?php if ($error) { ?>
             <div class="alert-error">
-                ⚠ <?= htmlspecialchars($error) ?>
+                ⚠ <?php echo htmlspecialchars($error); ?>
             </div>
-        <?php endif; ?>
+        <?php } ?>
 
         <form action="proses_login.php" method="POST">
 
