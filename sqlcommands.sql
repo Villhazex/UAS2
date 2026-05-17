@@ -1,27 +1,7 @@
--- ============================================================
--- Todo OOP (UAS2) - Setup database untuk hosting
--- Jalankan di phpMyAdmin setelah database dibuat di cPanel
--- ============================================================
+SET NAMES utf8mb4; --diperlukan agar tidak terjadi error saat meyimpan karakter khusus 
 
--- Ganti nama database jika di hosting berbeda (contoh: ridho_todo_oop)
--- CREATE DATABASE IF NOT EXISTS todo_oop
---   CHARACTER SET utf8mb4
---   COLLATE utf8mb4_general_ci;
--- USE todo_oop;
-
-SET NAMES utf8mb4;
-SET FOREIGN_KEY_CHECKS = 0;
-
-DROP TABLE IF EXISTS task_list_members;
-DROP TABLE IF EXISTS tugas;
-DROP TABLE IF EXISTS task_lists;
-DROP TABLE IF EXISTS users;
-
-SET FOREIGN_KEY_CHECKS = 1;
-
--- ------------------------------------------------------------
 -- 1. Tabel users (login & register)
--- ------------------------------------------------------------
+
 CREATE TABLE users (
   id INT(11) NOT NULL AUTO_INCREMENT,
   username VARCHAR(50) NOT NULL,
@@ -29,13 +9,12 @@ CREATE TABLE users (
   password VARCHAR(255) NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
-  UNIQUE KEY username (username),
-  UNIQUE KEY email (email)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  UNIQUE KEY username (username), --memastikan tidak ada dua user dengan username yang sama
+  UNIQUE KEY email (email) --memastikan tidak ada dua user dengan email yang samas
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci; --general_ci agar tidak case sensitive
 
--- ------------------------------------------------------------
 -- 2. Tabel task_lists (list pribadi / kelompok)
--- ------------------------------------------------------------
+
 CREATE TABLE task_lists (
   id INT(11) NOT NULL AUTO_INCREMENT,
   user_id INT(11) NOT NULL,
@@ -49,9 +28,8 @@ CREATE TABLE task_lists (
   UNIQUE KEY unique_user_slug (user_id, slug)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- ------------------------------------------------------------
 -- 3. Tabel tugas
--- ------------------------------------------------------------
+
 CREATE TABLE tugas (
   id INT(11) NOT NULL AUTO_INCREMENT,
   user_id INT(11) NOT NULL,
@@ -64,12 +42,11 @@ CREATE TABLE tugas (
   PRIMARY KEY (id),
   KEY fk_user_tugas (user_id),
   CONSTRAINT fk_user_tugas
-    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE --jika user dihapus, maka semua tugas yang terkait dengan user tersebut juga akan dihapus
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- ------------------------------------------------------------
 -- 4. Tabel task_list_members (anggota list kelompok)
--- ------------------------------------------------------------
+
 CREATE TABLE task_list_members (
   id INT(11) NOT NULL AUTO_INCREMENT,
   list_id INT(11) NOT NULL,
