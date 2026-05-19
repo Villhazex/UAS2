@@ -17,8 +17,7 @@ UAS/
 │   ├── Tugas.php
 │   ├── TugasListManager.php
 │   ├── TugasListMembers.php
-│   ├── TugasModel.php
-│   └── TugasSchemaManager.php
+│   └── TugasModel.php
 │
 ├── config/
 │   └── database.php
@@ -68,7 +67,6 @@ Project ini menggunakan beberapa konsep OOP seperti:
 - Constructor
 - Getter & Setter
 - Object & Class
-- Modular Structure
 
 ---
 

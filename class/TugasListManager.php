@@ -1,39 +1,39 @@
 <?php
 
-require_once __DIR__ . "/TugasListMembers.php";
+require_once __DIR__.'/TugasListMembers.php';
 
-/*
- * TugasListManager — OOP tingkat "susah"
- * Berisi semua logika bisnis pengelolaan list: CRUD list, slug, palette,
- * sinkronasi kategori lama, serta pengecekan akses anggota.
- */
-
-class TugasListManager {
-
+class TugasListManager
+{
     private $conn;
     private $members;
     private $defaultLists = [
         ['nama' => 'Pribadi', 'slug' => 'pribadi', 'warna' => '#008b8b', 'ikon' => '*'],
     ];
 
-    public function __construct($conn) {
+    public function __construct($conn)
+    {
         $this->conn = $conn;
         $this->members = new TugasListMembers($conn);
     }
 
-    public function slugify($text) {
+    public function slugify($text)
+    {
         $slug = strtolower(trim($text));
         $slug = preg_replace('/[^a-z0-9]+/', '-', $slug);
         $slug = trim($slug, '-');
+
         return $slug !== '' ? $slug : 'lainnya';
     }
 
-    private function listPalette($index) {
+    private function listPalette($index)
+    {
         $colors = ['#008b8b', '#3366ff', '#c1006b', '#6b00c1', '#b87200', '#006b38', '#c10000'];
+
         return $colors[$index % count($colors)];
     }
 
-    private function userCanAccessList($user_id, $list_id) {
+    private function userCanAccessList($user_id, $list_id)
+    {
         $user_id = (int) $user_id;
         $list_id = (int) $list_id;
 
@@ -51,7 +51,8 @@ class TugasListManager {
         return $result && $result->num_rows > 0;
     }
 
-    private function insertListIfMissing($user_id, $nama, $slug, $warna, $ikon, $jenis = 'pribadi') {
+    private function insertListIfMissing($user_id, $nama, $slug, $warna, $ikon, $jenis = 'pribadi')
+    {
         $user_id = (int) $user_id;
         $nama = $this->conn->real_escape_string($nama);
         $slug = $this->conn->real_escape_string($slug);
@@ -65,18 +66,21 @@ class TugasListManager {
         ");
     }
 
-    public function seedDefaultLists($user_id) {
+    public function seedDefaultLists($user_id)
+    {
         foreach ($this->defaultLists as $list) {
             $this->insertListIfMissing($user_id, $list['nama'], $list['slug'], $list['warna'], $list['ikon']);
         }
     }
 
-    public function resolveListId($user_id, $kategori) {
+    public function resolveListId($user_id, $kategori)
+    {
         $user_id = (int) $user_id;
         $kategori = trim((string) $kategori);
 
         if (preg_match('/^list:(\d+)$/', $kategori, $match)) {
             $list_id = (int) $match[1];
+
             return $this->userCanAccessList($user_id, $list_id) ? $list_id : null;
         }
 
@@ -91,6 +95,7 @@ class TugasListManager {
 
         if ($result && $result->num_rows > 0) {
             $row = $result->fetch_assoc();
+
             return (int) $row['id'];
         }
 
@@ -105,10 +110,12 @@ class TugasListManager {
             LIMIT 1
         ");
         $row = $result ? $result->fetch_assoc() : null;
+
         return $row ? (int) $row['id'] : null;
     }
 
-    public function syncLegacyTasks($user_id) {
+    public function syncLegacyTasks($user_id)
+    {
         $user_id = (int) $user_id;
         $legacy = $this->conn->query("
             SELECT DISTINCT kategori
@@ -117,7 +124,9 @@ class TugasListManager {
               AND (list_id IS NULL OR list_id = 0)
         ");
 
-        if (!$legacy) return;
+        if (!$legacy) {
+            return;
+        }
 
         while ($row = $legacy->fetch_assoc()) {
             $kategori = $row['kategori'] ?: 'pribadi';
@@ -136,7 +145,8 @@ class TugasListManager {
         }
     }
 
-    public function tambahList($user_id, $nama_list, $jenis = 'pribadi', $member_usernames = []) {
+    public function tambahList($user_id, $nama_list, $jenis = 'pribadi', $member_usernames = [])
+    {
         $user_id = (int) $user_id;
         $nama_list = trim($nama_list);
         $jenis = $jenis === 'kelompok' ? 'kelompok' : 'pribadi';
@@ -148,9 +158,9 @@ class TugasListManager {
         $members = ['ids' => [], 'missing' => []];
         if ($jenis === 'kelompok') {
             $members = $this->members->findMembers($member_usernames);
-            $members['ids'] = array_values(array_filter($members['ids'], fn($id) => $id !== $user_id));
+            $members['ids'] = array_values(array_filter($members['ids'], fn ($id) => $id !== $user_id));
             if (!empty($members['missing'])) {
-                return ['ok' => false, 'msg' => 'Username tidak ditemukan: ' . implode(', ', $members['missing']) . '.'];
+                return ['ok' => false, 'msg' => 'Username tidak ditemukan: '.implode(', ', $members['missing']).'.'];
             }
         }
 
@@ -192,12 +202,15 @@ class TugasListManager {
         }
 
         $memberResult = $this->members->applyMembers($list_id, $user_id, $jenis, $member_usernames);
-        if (!$memberResult['ok']) return $memberResult;
+        if (!$memberResult['ok']) {
+            return $memberResult;
+        }
 
         return ['ok' => true, 'msg' => $jenis === 'kelompok' ? 'List kelompok berhasil dibuat.' : 'List pribadi berhasil dibuat.'];
     }
 
-    public function editList($user_id, $list_id, $nama_list, $jenis = 'pribadi', $member_usernames = []) {
+    public function editList($user_id, $list_id, $nama_list, $jenis = 'pribadi', $member_usernames = [])
+    {
         $user_id = (int) $user_id;
         $list_id = (int) $list_id;
         $nama_list = trim($nama_list);
@@ -225,7 +238,7 @@ class TugasListManager {
         if ($jenis === 'kelompok') {
             $members = $this->members->findMembers($member_usernames);
             if (!empty($members['missing'])) {
-                return ['ok' => false, 'msg' => 'Username tidak ditemukan: ' . implode(', ', $members['missing']) . '.'];
+                return ['ok' => false, 'msg' => 'Username tidak ditemukan: '.implode(', ', $members['missing']).'.'];
             }
         }
 
@@ -259,7 +272,9 @@ class TugasListManager {
         }
 
         $memberResult = $this->members->applyMembers($list_id, $user_id, $jenis, $member_usernames);
-        if (!$memberResult['ok']) return $memberResult;
+        if (!$memberResult['ok']) {
+            return $memberResult;
+        }
 
         $this->conn->query("
             UPDATE tugas
@@ -270,7 +285,8 @@ class TugasListManager {
         return ['ok' => true, 'msg' => 'List berhasil diedit.'];
     }
 
-    public function hapusList($user_id, $list_id) {
+    public function hapusList($user_id, $list_id)
+    {
         $user_id = (int) $user_id;
         $list_id = (int) $list_id;
 
@@ -299,7 +315,8 @@ class TugasListManager {
         ];
     }
 
-    public function tampilLists($user_id) {
+    public function tampilLists($user_id)
+    {
         $user_id = (int) $user_id;
         $this->seedDefaultLists($user_id);
         $this->syncLegacyTasks($user_id);

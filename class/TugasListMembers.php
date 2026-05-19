@@ -1,19 +1,18 @@
 <?php
 
-/*
- * TugasListMembers — OOP tingkat "sedang"
- * Menangani pencarian user berdasarkan username dan pengelolaan anggota list.
- */
+// Menangani pencarian user berdasarkan username dan pengelolaan anggota list.
 
-class TugasListMembers {
-
+class TugasListMembers
+{
     private $conn;
 
-    public function __construct($conn) {
+    public function __construct($conn)
+    {
         $this->conn = $conn;
     }
 
-    private function findUsersByUsernames($usernames) {
+    private function CariUser($usernames)
+    {
         $ids = [];
         $missing = [];
         $clean = [];
@@ -26,8 +25,8 @@ class TugasListMembers {
         }
 
         foreach ($clean as $username) {
-            $stmt = $this->conn->prepare("SELECT id FROM users WHERE username = ? LIMIT 1");
-            $stmt->bind_param("s", $username);
+            $stmt = $this->conn->prepare('SELECT id FROM users WHERE username = ? LIMIT 1');
+            $stmt->bind_param('s', $username);
             $stmt->execute();
             $result = $stmt->get_result();
             if ($result && $result->num_rows > 0) {
@@ -40,21 +39,23 @@ class TugasListMembers {
         return ['ids' => $ids, 'missing' => $missing];
     }
 
-    private function applyListMembers($list_id, $owner_id, $jenis, $member_usernames) {
+    private function applyListMembers($list_id, $owner_id, $jenis, $member_usernames)
+    {
         $list_id = (int) $list_id;
         $owner_id = (int) $owner_id;
         $jenis = $jenis === 'kelompok' ? 'kelompok' : 'pribadi';
 
         if ($jenis === 'pribadi') {
             $this->conn->query("DELETE FROM task_list_members WHERE list_id = $list_id");
+
             return ['ok' => true, 'msg' => ''];
         }
 
-        $members = $this->findUsersByUsernames($member_usernames);
-        $memberIds = array_values(array_filter($members['ids'], fn($id) => $id !== $owner_id));
+        $members = $this->CariUser($member_usernames);
+        $memberIds = array_values(array_filter($members['ids'], fn ($id) => $id !== $owner_id));
 
         if (!empty($members['missing'])) {
-            return ['ok' => false, 'msg' => 'Username tidak ditemukan: ' . implode(', ', $members['missing']) . '.'];
+            return ['ok' => false, 'msg' => 'Username tidak ditemukan: '.implode(', ', $members['missing']).'.'];
         }
 
         $this->conn->query("DELETE FROM task_list_members WHERE list_id = $list_id");
@@ -70,11 +71,13 @@ class TugasListMembers {
         return ['ok' => true, 'msg' => ''];
     }
 
-    public function findMembers($usernames) {
-        return $this->findUsersByUsernames($usernames);
+    public function findMembers($usernames)
+    {
+        return $this->CariUser($usernames);
     }
 
-    public function applyMembers($list_id, $owner_id, $jenis, $member_usernames) {
+    public function applyMembers($list_id, $owner_id, $jenis, $member_usernames)
+    {
         return $this->applyListMembers($list_id, $owner_id, $jenis, $member_usernames);
     }
 }

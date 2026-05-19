@@ -3,11 +3,11 @@
 session_start();
 
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
+    header('Location: login.php');
     exit;
 }
 
-require_once "class/TugasModel.php";
+require_once 'class/TugasModel.php';
 
 $result = ['ok' => false, 'msg' => 'Data list tidak lengkap.'];
 
@@ -32,7 +32,5 @@ $_SESSION['toast'] = [
     'type' => $result['ok'] ? 'ok' : 'error',
 ];
 
-header("Location: index.php");
+header('Location: index.php');
 exit;
-
-?>

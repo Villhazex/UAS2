@@ -4,12 +4,7 @@ require_once __DIR__.'/Tugas.php';
 require_once __DIR__.'/../config/database.php';
 require_once __DIR__.'/TugasListManager.php';
 
-/*
- * TugasModel — OOP tingkat "mudah"
- * Class utama yang mewarisi Tugas. Mengatur koneksi database dan CRUD tugas.
- * Operasi list didelegasikan ke TugasListManager (OOP tingkat "susah").
- */
-
+// inheritance dari tugas
 class TugasModel extends Tugas
 {
     private $conn;
@@ -41,9 +36,7 @@ class TugasModel extends Tugas
         return $this->conn;
     }
 
-    /*
-     * ─── CRUD Tugas — OOP "Mudah" ───
-     */
+    // CRUD Tugas
 
     public function tambahTugas()
     {
@@ -152,9 +145,7 @@ class TugasModel extends Tugas
         ");
     }
 
-    /*
-     * ─── Proxy ke TugasListManager (OOP "Susah") ───
-     */
+    // Proxy ke TugasListManager
 
     public function tambahList($user_id, $nama_list, $jenis = 'pribadi', $member_usernames = [])
     {
