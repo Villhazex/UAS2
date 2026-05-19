@@ -1,4 +1,4 @@
-SET NAMES utf8mb4; --diperlukan agar tidak terjadi error saat meyimpan karakter khusus 
+SET NAMES utf8mb4; 
 
 -- 1. Tabel users (login & register)
 
@@ -9,9 +9,9 @@ CREATE TABLE users (
   password VARCHAR(255) NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
-  UNIQUE KEY username (username), --memastikan tidak ada dua user dengan username yang sama
-  UNIQUE KEY email (email) --memastikan tidak ada dua user dengan email yang samas
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci; --general_ci agar tidak case sensitive
+  UNIQUE KEY username (username),
+  UNIQUE KEY email (email) 
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci; 
 
 -- 2. Tabel task_lists (list pribadi / kelompok)
 
@@ -42,7 +42,7 @@ CREATE TABLE tugas (
   PRIMARY KEY (id),
   KEY fk_user_tugas (user_id),
   CONSTRAINT fk_user_tugas
-    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE --jika user dihapus, maka semua tugas yang terkait dengan user tersebut juga akan dihapus
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- 4. Tabel task_list_members (anggota list kelompok)
