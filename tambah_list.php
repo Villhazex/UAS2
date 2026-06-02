@@ -1,5 +1,7 @@
 <?php
 
+// Endpoint: membuat task list baru — dipanggil dari form modal "Tambah List"
+
 session_start();
 
 if (!isset($_SESSION['user_id'])) {

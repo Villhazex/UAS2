@@ -1,5 +1,7 @@
 <?php
 
+// Endpoint: menambah tugas baru — dipanggil dari form "Tambah tugas baru"
+
 session_start();
 
 $user_id = $_SESSION['user_id'];

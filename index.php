@@ -1,4 +1,5 @@
 <?php
+// Dashboard utama — menampilkan statistik, daftar tugas, dan list
 session_start();
 
 if (!isset($_SESSION['user_id'])) {
@@ -23,6 +24,7 @@ while ($list = $list_data->fetch_assoc()) {
     $lists[$key] = [];
 }
 
+// Statistik umum
 $total   = count($all_rows);
 $selesai = count(array_filter($all_rows, fn($r) => $r['status_tugas'] === 'Selesai'));
 $belum   = $total - $selesai;
@@ -52,7 +54,7 @@ foreach ($all_rows as $r) {
     }
 }
 
-// Overdue count
+// Hitung tugas yang melewati deadline
 $overdue = 0;
 foreach ($all_rows as $r) {
     if (!empty($r['due_date']) && $r['status_tugas'] !== 'Selesai') {
@@ -60,7 +62,7 @@ foreach ($all_rows as $r) {
     }
 }
 
-// Upcoming (within 3 days, not done)
+// Tugas yang deadline-nya dalam 3 hari ke depan
 $upcoming = [];
 foreach ($all_rows as $r) {
     if (!empty($r['due_date']) && $r['status_tugas'] !== 'Selesai') {
@@ -69,9 +71,10 @@ foreach ($all_rows as $r) {
     }
 }
 
-// Recent tasks (last 5)
+// 5 tugas terbaru
 $recent = array_slice(array_reverse($all_rows), 0, 5);
 
+// Warna dan ikon default untuk kategori built-in
 $category_colors = [
     'pelajaran'  => '#3366ff',
     'proyek'     => '#c1006b',
@@ -111,6 +114,7 @@ foreach ($list_meta as $key => $meta) {
     $category_icons[$key] = $meta['ikon'] ?: '.';
 }
 
+// Ambil pesan notifikasi (toast) dari session
 $toast = $_SESSION['toast'] ?? null;
 unset($_SESSION['toast']);
 ?>
@@ -509,6 +513,7 @@ unset($_SESSION['toast']);
 <div class="toast-container" id="toastContainer"></div>
 
 <script>
+// Sinkronisasi data PHP ke JavaScript untuk dashboard interaktif
 window.DASHBOARD_DATA = {
     lists: <?= json_encode($lists) ?>,
     labels: <?= json_encode(array_map(fn($m) => $m['nama_list'] ?? ucfirst($m['slug']), $list_meta)) ?>,

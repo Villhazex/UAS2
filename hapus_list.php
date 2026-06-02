@@ -1,5 +1,7 @@
 <?php
 
+// Endpoint: menghapus task list beserta semua tugas di dalamnya — dipanggil dari form modal
+
 session_start();
 
 if (!isset($_SESSION['user_id'])) {

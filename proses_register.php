@@ -1,17 +1,21 @@
 <?php
 
+// Endpoint: memproses pendaftaran user baru — validasi & simpan ke database
+
 session_start();
 
 require_once "config/database.php";
 
 $conn = connectDB();
 
+// Helper: redirect ke halaman registrasi dengan pesan error
 function redirectRegister($message) {
     $_SESSION['register_error'] = $message;
     header("Location: register.php");
     exit;
 }
 
+// Helper: buat tabel users jika belum ada
 function ensureRegisterSchema($conn) {
     $conn->query("
         CREATE TABLE IF NOT EXISTS users (
@@ -31,26 +35,32 @@ $email = trim($_POST['email'] ?? '');
 $password = $_POST['password'] ?? '';
 $confirm = $_POST['confirm_password'] ?? '';
 
+// Validasi: field wajib
 if ($username === '' || $email === '' || $password === '' || $confirm === '') {
     redirectRegister("Username, email, password, dan konfirmasi password wajib diisi.");
 }
 
+// Validasi: username minimal 3 karakter, tanpa spasi
 if (strlen($username) < 3 || preg_match('/\s/', $username)) {
     redirectRegister("Username minimal 3 karakter dan tidak boleh memakai spasi.");
 }
 
+// Validasi: format email
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     redirectRegister("Format email tidak valid.");
 }
 
+// Validasi: password minimal 8 karakter, gabungan huruf & angka
 if (!preg_match('/^(?=.*[A-Za-z])(?=.*\d).{8,}$/', $password)) {
     redirectRegister("Password minimal 8 karakter dan harus berisi huruf serta angka.");
 }
 
+// Validasi: konfirmasi password cocok
 if ($password !== $confirm) {
     redirectRegister("Konfirmasi password tidak cocok.");
 }
 
+// Cek duplikat username
 $stmt = $conn->prepare("SELECT id FROM users WHERE username = ? LIMIT 1");
 $stmt->bind_param("s", $username);
 $stmt->execute();
@@ -60,6 +70,7 @@ if ($cekUsername->num_rows > 0) {
     redirectRegister("Username sudah digunakan.");
 }
 
+// Cek duplikat email
 $stmt = $conn->prepare("SELECT id FROM users WHERE email = ? LIMIT 1");
 $stmt->bind_param("s", $email);
 $stmt->execute();
@@ -69,6 +80,7 @@ if ($cekEmail->num_rows > 0) {
     redirectRegister("Email sudah digunakan.");
 }
 
+// Hash password lalu simpan user baru
 $passwordHash = password_hash($password, PASSWORD_DEFAULT);
 
 $stmt = $conn->prepare("

@@ -1,4 +1,5 @@
 <?php
+// Halaman login — menampilkan form masuk dan pesan error jika ada
 session_start();
 $error = $_SESSION['login_error'] ?? null;
 unset($_SESSION['login_error']);

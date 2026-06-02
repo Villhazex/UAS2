@@ -2,20 +2,25 @@
 
 require_once __DIR__.'/TugasListMembers.php';
 
+// Class untuk mengelola task list (kategori) — CRUD list, seeding, sinkronisasi
 class TugasListManager
 {
-    private $conn;
-    private $members;
+    private $conn;     // Koneksi database
+    private $members;  // Objek pengelola anggota list kelompok
+
+    // Daftar list bawaan yang otomatis dibuat untuk setiap user baru
     private $defaultLists = [
         ['nama' => 'Pribadi', 'slug' => 'pribadi', 'warna' => '#008b8b', 'ikon' => '*'],
     ];
 
+    // Constructor: simpan koneksi DB dan siapkan pengelola anggota
     public function __construct($conn)
     {
         $this->conn = $conn;
         $this->members = new TugasListMembers($conn);
     }
 
+    // Mengubah teks menjadi slug URL-friendly (contoh: "Tugas Kuliah" → "tugas-kuliah")
     public function slugify($text)
     {
         $slug = strtolower(trim($text));
@@ -25,6 +30,7 @@ class TugasListManager
         return $slug !== '' ? $slug : 'lainnya';
     }
 
+    // Memilih warna dari palet berdasarkan urutan index (agar setiap list punya warna berbeda)
     private function listPalette($index)
     {
         $colors = ['#008b8b', '#3366ff', '#c1006b', '#6b00c1', '#b87200', '#006b38', '#c10000'];
@@ -32,6 +38,7 @@ class TugasListManager
         return $colors[$index % count($colors)];
     }
 
+    // Mengecek apakah user punya akses ke suatu list (sebagai pemilik atau anggota)
     private function userCanAccessList($user_id, $list_id)
     {
         $user_id = (int) $user_id;
@@ -51,6 +58,7 @@ class TugasListManager
         return $result && $result->num_rows > 0;
     }
 
+    // Menyisipkan list baru hanya jika belum ada (INSERT IGNORE)
     private function insertListIfMissing($user_id, $nama, $slug, $warna, $ikon, $jenis = 'pribadi')
     {
         $user_id = (int) $user_id;
@@ -66,6 +74,7 @@ class TugasListManager
         ");
     }
 
+    // Membuat list default untuk user (jika belum ada)
     public function seedDefaultLists($user_id)
     {
         foreach ($this->defaultLists as $list) {
@@ -73,11 +82,13 @@ class TugasListManager
         }
     }
 
+    // Mencari ID list berdasarkan kategori/slug; membuat list baru jika belum ada
     public function resolveListId($user_id, $kategori)
     {
         $user_id = (int) $user_id;
         $kategori = trim((string) $kategori);
 
+        // Jika kategori berupa "list:ID", langsung cari berdasarkan ID
         if (preg_match('/^list:(\d+)$/', $kategori, $match)) {
             $list_id = (int) $match[1];
 
@@ -99,6 +110,7 @@ class TugasListManager
             return (int) $row['id'];
         }
 
+        // Jika list dengan slug tersebut belum ada, buat baru
         $nama = ucwords(str_replace('-', ' ', $slug));
         $count = $this->conn->query("SELECT COUNT(*) AS total FROM task_lists WHERE user_id = $user_id");
         $idx = $count ? (int) $count->fetch_assoc()['total'] : 0;
@@ -114,6 +126,7 @@ class TugasListManager
         return $row ? (int) $row['id'] : null;
     }
 
+    // Sinkronisasi tugas lama (yang belum punya list_id) agar terhubung ke task_lists
     public function syncLegacyTasks($user_id)
     {
         $user_id = (int) $user_id;
@@ -145,6 +158,9 @@ class TugasListManager
         }
     }
 
+    // ─── CRUD List ──────────────────────────────────────
+
+    // Membuat list baru (pribadi/kelompok) lengkap dengan anggota
     public function tambahList($user_id, $nama_list, $jenis = 'pribadi', $member_usernames = [])
     {
         $user_id = (int) $user_id;
@@ -209,6 +225,7 @@ class TugasListManager
         return ['ok' => true, 'msg' => $jenis === 'kelompok' ? 'List kelompok berhasil dibuat.' : 'List pribadi berhasil dibuat.'];
     }
 
+    // Mengedit nama, jenis, dan anggota list (hanya pemilik yang bisa)
     public function editList($user_id, $list_id, $nama_list, $jenis = 'pribadi', $member_usernames = [])
     {
         $user_id = (int) $user_id;
@@ -285,6 +302,7 @@ class TugasListManager
         return ['ok' => true, 'msg' => 'List berhasil diedit.'];
     }
 
+    // Menghapus list beserta semua tugas dan data anggota (hanya pemilik)
     public function hapusList($user_id, $list_id)
     {
         $user_id = (int) $user_id;
@@ -315,6 +333,7 @@ class TugasListManager
         ];
     }
 
+    // Menampilkan semua list yang dimiliki atau bisa diakses user
     public function tampilLists($user_id)
     {
         $user_id = (int) $user_id;

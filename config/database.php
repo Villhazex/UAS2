@@ -1,5 +1,6 @@
 <?php
 
+// Fungsi koneksi database MySQL — dipanggil oleh semua file yang butuh akses DB
 function connectDB($host = 'localhost', $username = 'root', $password = '', $database = 'todo_oop')
 {
     $conn = new mysqli($host, $username, $password, $database);

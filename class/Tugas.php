@@ -1,14 +1,17 @@
 <?php
 
+// Class dasar (parent) yang merepresentasikan satu tugas
 class Tugas
 {
-    protected $namaTugas;
-    protected $statusTugas;
-    protected $dueDate;
-    protected $prioritas;
-    protected $kategori;
-    protected $userId;
+    // Properti tugas
+    protected $namaTugas;    // Judul tugas
+    protected $statusTugas;  // 'Belum Selesai' atau 'Selesai'
+    protected $dueDate;      // Tenggat waktu (YYYY-MM-DD)
+    protected $prioritas;    // 'tinggi', 'sedang', 'rendah', atau ''
+    protected $kategori;     // Slug kategori/list tempat tugas berada
+    protected $userId;       // ID pemilik tugas
 
+    // Constructor: mengisi properti saat objek dibuat
     public function __construct(
         $namaTugas = '',
         $statusTugas = 'Belum Selesai',
@@ -17,14 +20,15 @@ class Tugas
         $kategori = '',
         $userId = 0
     ) {
-        $this->namaTugas = $namaTugas;
-        $this->statusTugas = $statusTugas;
-        $this->dueDate = $dueDate;
-        $this->prioritas = $prioritas;
-        $this->kategori = $kategori;
-        $this->userId = $userId;
+        $this->setNamaTugas($namaTugas);
+        $this->setStatusTugas($statusTugas);
+        $this->setDueDate($dueDate);
+        $this->setPrioritas($prioritas);
+        $this->setKategori($kategori);
+        $this->setUserId($userId);
     }
 
+    // Setter: mengubah nilai properti
     public function setNamaTugas($namaTugas)
     {
         $this->namaTugas = $namaTugas;
@@ -55,6 +59,7 @@ class Tugas
         $this->kategori = $kategori;
     }
 
+    // Getter: membaca nilai properti
     public function getNamaTugas()
     {
         return $this->namaTugas;

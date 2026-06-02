@@ -4,12 +4,13 @@ require_once __DIR__.'/Tugas.php';
 require_once __DIR__.'/../config/database.php';
 require_once __DIR__.'/TugasListManager.php';
 
-// inheritance dari tugas
+// Class utama untuk operasi CRUD tugas dan delegasi manajemen list
 class TugasModel extends Tugas
 {
-    private $conn;
-    private $listManager;
+    private $conn;          // Koneksi database
+    private $listManager;   // Objek pengelola task list
 
+    // Constructor: mewarisi properti Tugas, lalu siapkan koneksi DB dan ListManager
     public function __construct(
         $namaTugas = '',
         $statusTugas = 'Belum Selesai',
@@ -31,13 +32,15 @@ class TugasModel extends Tugas
         $this->listManager = new TugasListManager($this->conn);
     }
 
+    // Getter koneksi database (dipakai oleh controller lain jika perlu)
     public function getConn()
     {
         return $this->conn;
     }
 
-    // CRUD Tugas
+    // ─── CRUD Tugas ───────────────────────────────────────
 
+    // Menyimpan tugas baru ke database
     public function tambahTugas()
     {
         $userId = (int) $this->userId;
@@ -60,6 +63,7 @@ class TugasModel extends Tugas
         ");
     }
 
+    // Menampilkan semua tugas milik user (termasuk tugas dari list kelompok)
     public function tampilTugas($user_id)
     {
         $user_id = (int) $user_id;
@@ -89,6 +93,7 @@ class TugasModel extends Tugas
         ");
     }
 
+    // Menghapus satu tugas berdasarkan ID (dengan pengecekan akses)
     public function hapusTugas($id, $user_id)
     {
         $id = (int) $id;
@@ -105,6 +110,7 @@ class TugasModel extends Tugas
         ");
     }
 
+    // Menandai tugas sebagai 'Selesai' (dengan pengecekan akses)
     public function selesaiTugas($id, $user_id)
     {
         $id = (int) $id;
@@ -122,6 +128,7 @@ class TugasModel extends Tugas
         ");
     }
 
+    // Menghapus semua tugas milik user
     public function hapusSemua($user_id)
     {
         $user_id = (int) $user_id;
@@ -133,6 +140,7 @@ class TugasModel extends Tugas
         ");
     }
 
+    // Menghapus tugas yang sudah selesai milik user
     public function hapusSelesai($user_id)
     {
         $user_id = (int) $user_id;
@@ -145,23 +153,27 @@ class TugasModel extends Tugas
         ");
     }
 
-    // Proxy ke TugasListManager
+    // ─── Delegasi ke TugasListManager ────────────────────
 
+    // Membuat list baru (pribadi/kelompok)
     public function tambahList($user_id, $nama_list, $jenis = 'pribadi', $member_usernames = [])
     {
         return $this->listManager->tambahList($user_id, $nama_list, $jenis, $member_usernames);
     }
 
+    // Mengedit nama/jenis/anggota list
     public function editList($user_id, $list_id, $nama_list, $jenis = 'pribadi', $member_usernames = [])
     {
         return $this->listManager->editList($user_id, $list_id, $nama_list, $jenis, $member_usernames);
     }
 
+    // Menghapus list beserta semua tugas di dalamnya
     public function hapusList($user_id, $list_id)
     {
         return $this->listManager->hapusList($user_id, $list_id);
     }
 
+    // Menampilkan semua list yang bisa diakses user
     public function tampilLists($user_id)
     {
         return $this->listManager->tampilLists($user_id);

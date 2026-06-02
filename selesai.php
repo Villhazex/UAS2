@@ -1,5 +1,7 @@
 <?php
 
+// Endpoint: menandai tugas sebagai selesai — dipanggil via link/GET
+
 session_start();
 
 require_once "class/TugasModel.php";

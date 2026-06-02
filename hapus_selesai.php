@@ -1,5 +1,7 @@
 <?php
 
+// Endpoint: menghapus semua tugas yang sudah selesai — dipanggil dari tombol "Hapus Selesai"
+
 session_start();
 
 require_once "class/TugasModel.php";

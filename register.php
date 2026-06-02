@@ -1,4 +1,5 @@
 <?php
+// Halaman registrasi — menampilkan form daftar akun baru dan pesan sukses/error
 session_start();
 
 $error   = $_SESSION['register_error']   ?? null;

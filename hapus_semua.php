@@ -1,8 +1,10 @@
 <?php
 
+// Endpoint: menghapus semua tugas milik user — dipanggil dari tombol "Hapus Semua"
+
 session_start();
 
-require_once "class/TugasModel.php";
+require_once 'class/TugasModel.php';
 
 $user_id = $_SESSION['user_id'];
 
@@ -10,7 +12,6 @@ $tugas = new TugasModel();
 
 $tugas->hapusSemua($user_id);
 
-header("Location: index.php");
+header('Location: index.php');
 
 exit;
-?>
