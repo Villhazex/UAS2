@@ -1,3 +1,5 @@
+CREATE DATABASE todo_oop;
+USE todo_oop;
 SET NAMES utf8mb4; 
 
 -- 1. Tabel users (login & register)
